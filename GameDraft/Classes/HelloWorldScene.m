@@ -9,7 +9,7 @@
 
 #import "HelloWorldScene.h"
 #import "Street.h"
-#import "Car.h"
+#import "Bicycle.h"
 #import "IntroScene.h"
 
 // -----------------------------------------------------------------------
@@ -22,7 +22,7 @@
     // i'm definitely gonna have an array of cars.
     // and car is gonna be an object. i think.
     Street *_traffic;
-    Car *_car1;
+    Bicycle *_bike;
 }
 
 // -----------------------------------------------------------------------
@@ -40,13 +40,21 @@
 {
     if (self = [super init]) {
         // init stuff
+        UISwipeGestureRecognizer *swipeLeftToRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleLeftSwipe:)];
+        [swipeLeftToRight setDirection:UISwipeGestureRecognizerDirectionRight];
+        [swipeLeftToRight setDelegate:self];
+        [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeLeftToRight];
+        
+        UISwipeGestureRecognizer *swipeRightToLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleRightSwipe:)];
+        [swipeRightToLeft setDirection:UISwipeGestureRecognizerDirectionLeft];
+        [swipeRightToLeft setDelegate:self];
+        [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeRightToLeft];
+        
         _traffic = [[Street alloc] init];
         [self addChild:_traffic];
-//        _car1 = [[Car alloc] init];
-//        [self addChild:_car1];
-//        Car *car2 = [[Car alloc] init];
-//        [car2 setPosition:CGPointMake(100, 100)];
-//        [self addChild:car2];
+        _bike = [[Bicycle alloc] init];
+        _bike.position = ccp(240, 160);
+        [_traffic addChild:_bike];
         
         NSLog(@"created stuff");
     }
@@ -97,13 +105,22 @@
 {
     // always call super onExit last
     [super onExit];
+    
+    // not sure why i'm doing this part but the tutorial said to
+    NSArray *grs = [[[CCDirector sharedDirector] view] gestureRecognizers];
+    
+    for (UIGestureRecognizer *gesture in grs){
+        if([gesture isKindOfClass:[UISwipeGestureRecognizer class]]){
+            [[[CCDirector sharedDirector] view] removeGestureRecognizer:gesture];
+        }
+    }
 }
 
 // -----------------------------------------------------------------------
 #pragma mark - Touch Handler
 // -----------------------------------------------------------------------
 
--(void) touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
+- (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
     CGPoint touchLoc = [touch locationInNode:self];
     
     // Log touch location
@@ -112,6 +129,16 @@
     // Move our sprite to touch location
     CCActionMoveTo *actionMove = [CCActionMoveTo actionWithDuration:1.0f position:touchLoc];
     [_sprite runAction:actionMove];
+}
+
+- (void)handleRightSwipe:(UISwipeGestureRecognizer*)recognizer {
+    NSLog(@"right swpipe"); //change this to accelerometer
+    [_bike moveLeft];
+}
+
+- (void)handleLeftSwipe:(UISwipeGestureRecognizer*)recognizer {
+    NSLog(@"left swipe");
+    [_bike moveRight];
 }
 
 // -----------------------------------------------------------------------

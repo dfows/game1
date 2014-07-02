@@ -10,6 +10,8 @@
 		4C41FC0A19637B6A00D9D24A /* gsd.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C41FC0919637B6A00D9D24A /* gsd.png */; };
 		4C41FC0C19637FA100D9D24A /* trees.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C41FC0B19637FA100D9D24A /* trees.png */; };
 		4C41FC0E19637FAD00D9D24A /* people.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C41FC0D19637FAD00D9D24A /* people.png */; };
+		4C41FC111963E35A00D9D24A /* Bicycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C41FC101963E35A00D9D24A /* Bicycle.m */; };
+		4C41FC131963E5A500D9D24A /* Bike.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C41FC121963E5A500D9D24A /* Bike.png */; };
 		4CB6D4111962347600D3FAAD /* Street.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CB6D4101962347600D3FAAD /* Street.m */; };
 		4CB6D4191963122000D3FAAD /* Car.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CB6D4181963122000D3FAAD /* Car.m */; };
 		4CE1E98F1960B69A00C076D1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE1E98E1960B69A00C076D1 /* QuartzCore.framework */; };
@@ -233,6 +235,9 @@
 		4C41FC0919637B6A00D9D24A /* gsd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gsd.png; sourceTree = "<group>"; };
 		4C41FC0B19637FA100D9D24A /* trees.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trees.png; sourceTree = "<group>"; };
 		4C41FC0D19637FAD00D9D24A /* people.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = people.png; sourceTree = "<group>"; };
+		4C41FC0F1963E35A00D9D24A /* Bicycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bicycle.h; sourceTree = "<group>"; };
+		4C41FC101963E35A00D9D24A /* Bicycle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Bicycle.m; sourceTree = "<group>"; };
+		4C41FC121963E5A500D9D24A /* Bike.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Bike.png; sourceTree = "<group>"; };
 		4CB6D40F1962347600D3FAAD /* Street.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Street.h; sourceTree = "<group>"; };
 		4CB6D4101962347600D3FAAD /* Street.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Street.m; sourceTree = "<group>"; };
 		4CB6D4171963122000D3FAAD /* Car.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Car.h; sourceTree = "<group>"; };
@@ -1560,8 +1565,11 @@
 				4CB6D4101962347600D3FAAD /* Street.m */,
 				4CB6D4171963122000D3FAAD /* Car.h */,
 				4CB6D4181963122000D3FAAD /* Car.m */,
+				4C41FC0F1963E35A00D9D24A /* Bicycle.h */,
+				4C41FC101963E35A00D9D24A /* Bicycle.m */,
 				4C41FC0919637B6A00D9D24A /* gsd.png */,
 				4C41FC0D19637FAD00D9D24A /* people.png */,
+				4C41FC121963E5A500D9D24A /* Bike.png */,
 				4C41FC0B19637FA100D9D24A /* trees.png */,
 				4CE1EC3C1960B69D00C076D1 /* IntroScene.h */,
 				4CE1EC3D1960B69D00C076D1 /* IntroScene.m */,
@@ -1637,6 +1645,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C41FC131963E5A500D9D24A /* Bike.png in Resources */,
 				4CE1E9AB1960B69A00C076D1 /* Default@2x.png in Resources */,
 				4C41FC0E19637FAD00D9D24A /* people.png in Resources */,
 				4CE1E9BE1960B69A00C076D1 /* Icon-120.png in Resources */,
@@ -1774,6 +1783,7 @@
 				4CE1EC3B1960B69D00C076D1 /* HelloWorldScene.m in Sources */,
 				4CE1EB9B1960B69C00C076D1 /* neon_matrix_impl.c in Sources */,
 				4CE1EA201960B69A00C076D1 /* CCLabelTTF.m in Sources */,
+				4C41FC111963E35A00D9D24A /* Bicycle.m in Sources */,
 				4CE1EAD51960B69B00C076D1 /* NSEvent+CC.m in Sources */,
 				4CE1EB321960B69C00C076D1 /* ALDevice.m in Sources */,
 				4CE1EBA51960B69C00C076D1 /* vec2.c in Sources */,

@@ -8,6 +8,7 @@
 
 #import "Street.h"
 #import "Car.h"
+#import "Bicycle.h"
 
 @implementation Street {
     // private vars here
@@ -22,7 +23,7 @@
         // each lane has an array property. i don't know how many cars to put in it. maybe create a function to populate the lanes.
 
         self.cars = [[NSMutableArray alloc] init];
-        self.numLanes = (int)((arc4random() % 4)+1);
+        self.numLanes = (int)((arc4random() % 4)+1); // buckets
         NSLog(@"numLanes %i",self.numLanes);
         CGRect screenBound = [[UIScreen mainScreen] bounds];
         CGSize screenSize = screenBound.size;
@@ -35,7 +36,6 @@
             CGFloat carx = (screenWidth/4)*(i+1)+50;
             CGFloat cary = -100;
             [self makeCarAtX:carx AtY:cary];
-            NSLog(@"num stuff in self.cars %lu",[self.cars count]);
         }
     }
     return self;
@@ -55,7 +55,6 @@
         if ([car isOffScreen]) {
             float carx = car.position.x;
             [self.cars removeObjectAtIndex:i];
-            NSLog(@"car removed");
             [self removeChild:car];
             [self makeCarAtX:carx AtY:0];
         }

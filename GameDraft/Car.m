@@ -33,7 +33,6 @@
 }
 
 - (BOOL)isOffScreen {
-    NSLog(@"ypos is: %f",self.position.y);
     return (self.position.y > 320.0f+25);
 }
 
