@@ -7,10 +7,11 @@
 //
 // -----------------------------------------------------------------------
 
+#import "CCTextureCache.h"
 #import "HelloWorldScene.h"
 #import "Street.h"
+#import "Car.h"
 #import "Bicycle.h"
-#import "IntroScene.h"
 
 // -----------------------------------------------------------------------
 #pragma mark - HelloWorldScene
@@ -19,9 +20,8 @@
 @implementation HelloWorldScene
 {
     CCSprite *_sprite;
-    // i'm definitely gonna have an array of cars.
-    // and car is gonna be an object. i think.
     Street *_traffic;
+    CCPhysicsNode *_physicsNode;
     Bicycle *_bike;
 }
 
@@ -40,6 +40,12 @@
 {
     if (self = [super init]) {
         // init stuff
+        UISwipeGestureRecognizer *swipeUptToDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleDownSwipeBoom:)];
+        [swipeUptToDown setDirection:UISwipeGestureRecognizerDirectionDown];
+        [swipeUptToDown setDelegate:self];
+        [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeUptToDown];
+
+        
         UISwipeGestureRecognizer *swipeLeftToRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleLeftSwipe:)];
         [swipeLeftToRight setDirection:UISwipeGestureRecognizerDirectionRight];
         [swipeLeftToRight setDelegate:self];
@@ -50,11 +56,15 @@
         [swipeRightToLeft setDelegate:self];
         [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeRightToLeft];
         
+        _physicsNode = [CCPhysicsNode node];
+        _physicsNode.collisionDelegate = self;
+        _physicsNode.gravity = ccp(0,0);
         _traffic = [[Street alloc] init];
-        [self addChild:_traffic];
         _bike = [[Bicycle alloc] init];
         _bike.position = ccp(240, 160);
         [_traffic addChild:_bike];
+        [_physicsNode addChild:_traffic];
+        [self addChild:_physicsNode];
         
         NSLog(@"created stuff");
     }
@@ -101,6 +111,14 @@
 
 // -----------------------------------------------------------------------
 
+- (BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair bike:(CCSprite *)player car:(CCNode *)enemy {
+    NSLog(@"FIX BIKE! REPAIR NEEDED");
+    [player setTexture:[[CCTextureCache sharedTextureCache] addImage:@"people.png"]];
+    return TRUE;
+}
+
+// -----------------------------------------------------------------------
+
 - (void)onExit
 {
     // always call super onExit last
@@ -141,6 +159,13 @@
     [_bike moveRight];
 }
 
+- (void)handleDownSwipeBoom:(UISwipeGestureRecognizer*)recognizer {
+    NSLog(@"restarting");
+    // restart this scene
+//    CCTransition *transition = [CCTransition transitionFadeWithDuration:0.8f];
+//    [[CCDirector sharedDirector] presentScene:@"HelloWorldScene" withTransition:transition];
+}
+
 // -----------------------------------------------------------------------
 #pragma mark - Button Callbacks
 // -----------------------------------------------------------------------
@@ -148,8 +173,10 @@
 - (void)onBackClicked:(id)sender
 {
     // back to intro scene with transition
+    /*
     [[CCDirector sharedDirector] replaceScene:[IntroScene scene]
                                withTransition:[CCTransition transitionPushWithDirection:CCTransitionDirectionRight duration:1.0f]];
+     */
 }
 
 // -----------------------------------------------------------------------

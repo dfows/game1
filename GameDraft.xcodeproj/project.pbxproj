@@ -218,7 +218,6 @@
 		4CE1EC341960B69D00C076D1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE1EC331960B69D00C076D1 /* main.m */; };
 		4CE1EC381960B69D00C076D1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE1EC371960B69D00C076D1 /* AppDelegate.m */; };
 		4CE1EC3B1960B69D00C076D1 /* HelloWorldScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE1EC3A1960B69D00C076D1 /* HelloWorldScene.m */; };
-		4CE1EC3E1960B69D00C076D1 /* IntroScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CE1EC3D1960B69D00C076D1 /* IntroScene.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -668,8 +667,6 @@
 		4CE1EC371960B69D00C076D1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Classes/AppDelegate.m; sourceTree = "<group>"; };
 		4CE1EC391960B69D00C076D1 /* HelloWorldScene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HelloWorldScene.h; path = Classes/HelloWorldScene.h; sourceTree = "<group>"; };
 		4CE1EC3A1960B69D00C076D1 /* HelloWorldScene.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = HelloWorldScene.m; path = Classes/HelloWorldScene.m; sourceTree = "<group>"; };
-		4CE1EC3C1960B69D00C076D1 /* IntroScene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IntroScene.h; path = Classes/IntroScene.h; sourceTree = "<group>"; };
-		4CE1EC3D1960B69D00C076D1 /* IntroScene.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = IntroScene.m; path = Classes/IntroScene.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1571,8 +1568,6 @@
 				4C41FC0D19637FAD00D9D24A /* people.png */,
 				4C41FC121963E5A500D9D24A /* Bike.png */,
 				4C41FC0B19637FA100D9D24A /* trees.png */,
-				4CE1EC3C1960B69D00C076D1 /* IntroScene.h */,
-				4CE1EC3D1960B69D00C076D1 /* IntroScene.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -1740,7 +1735,6 @@
 				4CE1EAF31960B69B00C076D1 /* NSThread+performBlock.m in Sources */,
 				4CE1EA7E1960B69B00C076D1 /* CCShaderCache.m in Sources */,
 				4CE1EBBB1960B69C00C076D1 /* CCBSequenceProperty.m in Sources */,
-				4CE1EC3E1960B69D00C076D1 /* IntroScene.m in Sources */,
 				4CE1EAC21960B69B00C076D1 /* CCGLView.m in Sources */,
 				4CE1EA851960B69B00C076D1 /* CCSprite.m in Sources */,
 				4CE1E9E11960B69A00C076D1 /* CCActionInterval.m in Sources */,
