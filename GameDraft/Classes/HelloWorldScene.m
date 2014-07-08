@@ -7,8 +7,8 @@
 //
 // -----------------------------------------------------------------------
 
-#import "CCTextureCache.h"
 #import "HelloWorldScene.h"
+#import "Maze.h"
 #import "Street.h"
 #import "Car.h"
 #import "Bicycle.h"
@@ -20,6 +20,7 @@
 @implementation HelloWorldScene
 {
     CCSprite *_sprite;
+    Maze *_grid;
     Street *_traffic;
     CCPhysicsNode *_physicsNode;
     Bicycle *_bike;
@@ -59,6 +60,7 @@
         _physicsNode = [CCPhysicsNode node];
         _physicsNode.collisionDelegate = self;
         _physicsNode.gravity = ccp(0,0);
+        _grid = [[Maze alloc] init];
         _traffic = [[Street alloc] init];
         _bike = [[Bicycle alloc] init];
         _bike.position = ccp(240, 160);
@@ -106,14 +108,27 @@
 // -----------------------------------------------------------------------
 
 - (void)update:(CCTime)delta {
-    
+    [self detectObstacle];
+}
+
+- (void)detectObstacle {
+    // when a car is near another object, slow it down
+    for (Car *c in _traffic.cars) {
+        // if it is coming up on the bike, 2% chance of hitting it
+        float distAway = ccpDistance(_bike.position,c.position);
+        if (distAway < 50.0f) {
+            if (arc4random()%10 < 9) { // 90% of the time there is no crash
+                c.velocity *= .5;
+            }
+        }
+    }
 }
 
 // -----------------------------------------------------------------------
 
-- (BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair bike:(CCSprite *)player car:(CCNode *)enemy {
+- (BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair bike:(Bicycle *)player car:(CCNode *)enemy {
     NSLog(@"FIX BIKE! REPAIR NEEDED");
-    [player setTexture:[[CCTextureCache sharedTextureCache] addImage:@"people.png"]];
+    player.isBroken = YES;
     return TRUE;
 }
 
@@ -151,6 +166,7 @@
 
 - (void)handleRightSwipe:(UISwipeGestureRecognizer*)recognizer {
     NSLog(@"right swpipe"); //change this to accelerometer
+    // is there a way to get how much swiping was done / how strong/fast the swipe was
     [_bike moveLeft];
 }
 

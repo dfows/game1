@@ -10,6 +10,7 @@
 
 @interface Car : CCSprite
 
+@property (assign) float velocity;
 - (BOOL)isOffScreen;
 
 @end
