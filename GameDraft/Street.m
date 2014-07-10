@@ -56,7 +56,7 @@
             float carx = car.position.x;
             [self.cars removeObjectAtIndex:i];
             [self removeChild:car];
-            [self makeCarAtX:carx AtY:0];
+            [self makeCarAtX:carx AtY:-100];
         }
     }
 }

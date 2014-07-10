@@ -20,6 +20,7 @@
 @implementation HelloWorldScene
 {
     CCSprite *_sprite;
+    int _currentTileRow, _currentTileCol;
     Maze *_grid;
     Street *_traffic;
     CCPhysicsNode *_physicsNode;
@@ -61,6 +62,8 @@
         _physicsNode.collisionDelegate = self;
         _physicsNode.gravity = ccp(0,0);
         _grid = [[Maze alloc] init];
+        _currentTileRow = 0;
+        _currentTileCol = 0;
         _traffic = [[Street alloc] init];
         _bike = [[Bicycle alloc] init];
         _bike.position = ccp(240, 160);
@@ -98,17 +101,37 @@
 {
     // always call super onEnter first
     [super onEnter];
+    // load in the map piece
+    CCSprite *mapPiece = [[_grid.map objectAtIndex:_currentTileRow] objectAtIndex:_currentTileCol];
+    CGRect screenBound = [[UIScreen mainScreen] bounds];
+    CGSize screenSize = screenBound.size;
+    CGFloat screenWidth = screenSize.width;
+    CGFloat screenHeight = screenSize.height;
+    mapPiece.position = ccp(screenWidth/2,screenHeight/2);
+    mapPiece.scale = .25;
+    mapPiece.zOrder = -1;
+    [self addChild:mapPiece];
     
-    // In pre-v3, touch enable and scheduleUpdate was called here
-    // In v3, touch is enabled by setting userInterActionEnabled for the individual nodes
-    // Per frame update is automatically enabled, if update is overridden
-    
+    _physicsNode.contentSize = screenSize;
+    CCActionFollow *follow = [CCActionFollow actionWithTarget:_bike];
+    //CCLOG(@"%f,%f boudning",_physicsNode.boundingBox.size.width,_physicsNode.boundingBox.size.height);
+    [self runAction:follow];
 }
 
 // -----------------------------------------------------------------------
 
 - (void)update:(CCTime)delta {
     [self detectObstacle];
+    NSLog(@"bike position: (%f,%f)",_bike.position.x,_bike.position.y);
+    // when bike gets to left or right boundaries of the scene, turn map to the left or right (swivel entire screen)
+    
+    // preload surrounding map pieces when bike enters a map piece
+    // if (_bike.position.y > mapPiece????
+}
+
+- (void)preloadSurroundingMap {
+    // add things to scene
+    //for (int i = )
 }
 
 - (void)detectObstacle {

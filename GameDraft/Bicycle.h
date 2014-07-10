@@ -11,6 +11,7 @@
 @interface Bicycle : CCSprite
 
 @property (assign) BOOL isBroken;
+@property (assign) float velocity;
 
 - (BOOL)isOffScreen;
 - (void)moveRight;

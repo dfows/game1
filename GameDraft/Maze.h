@@ -10,6 +10,6 @@
 
 @interface Maze : NSObject
 
-@property (strong, nonatomic) NSMutableArray *maze;
+@property (strong, nonatomic) NSMutableArray *map;
 
 @end
