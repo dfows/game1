@@ -59,12 +59,16 @@
         int cellType = [_allNodes[c_row][c_col] intValue];
         if (c_col < _numColumns-1) {
             if ((cellType >> 2) & 1) {
-                // knock down wall to immediate right neighbor
-                NSLog(@"knocking down own right wall. i am at %i, %i",c_row,c_col);
-                [self knockDownWall:4 atRow:c_row atCol:c_col];
-                // add its immediate right neighbor
-                [queue addObject:[NSNumber numberWithInt:currentNum+1]];
-                [self knockDownWall:1 atRow:c_row atCol:c_col+1]; // knock down the cell's west wall
+                // if its immediate right neighbor hasnt already had its west wall knocked down
+                int rightNeighbor = [_allNodes[c_row][c_col+1] intValue];
+                if (((rightNeighbor >> 0) & 1) && (arc4random()%3!=2)) { // <=66% chance of this happening
+                    // knock down wall to immediate right neighbor
+                    NSLog(@"knocking down own right wall. i am at %i, %i",c_row,c_col);
+                    [self knockDownWall:4 atRow:c_row atCol:c_col];
+                    // add its immediate right neighbor
+                    [queue addObject:[NSNumber numberWithInt:currentNum+1]];
+                    [self knockDownWall:1 atRow:c_row atCol:c_col+1]; // knock down the cell's west wall
+                }
             }
         }
         if (c_row < _numRows-1) {
@@ -72,8 +76,11 @@
                 // knock down wall to above neighbor
                 [self knockDownWall:8 atRow:c_row atCol:c_col];
                 // and its above neighbor
-                [queue addObject:[NSNumber numberWithInt:currentNum+_numColumns]];
-                [self knockDownWall:2 atRow:c_row+1 atCol:c_col]; // knock down the cell's southern wall
+                int aboveNeighbor = [_allNodes[c_row+1][c_col] intValue];
+                if ((aboveNeighbor >> 1) & 1) {
+                    [queue addObject:[NSNumber numberWithInt:currentNum+_numColumns]];
+                    [self knockDownWall:2 atRow:c_row+1 atCol:c_col]; // knock down the cell's southern wall
+                }
             }
         }
     }

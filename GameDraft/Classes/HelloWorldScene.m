@@ -108,7 +108,8 @@
     CGSize screenSize = screenBound.size;
     CGFloat screenWidth = screenSize.width;
     CGFloat screenHeight = screenSize.height;
-    mapPiece.position = ccp(screenWidth/2,screenHeight/2);
+    mapPiece.anchorPoint = ccp(0,0);
+    mapPiece.position = ccp(0,0); //ccp(screenWidth/2,screenHeight/2);
     mapPiece.scale = .25;
     mapPiece.zOrder = -1;
     [self addChild:mapPiece];

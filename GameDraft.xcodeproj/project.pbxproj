@@ -30,6 +30,7 @@
 		4CDEE021196DCAFB008D47C1 /* road_11.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE019196DCAFB008D47C1 /* road_11.png */; };
 		4CDEE022196DCAFB008D47C1 /* road_12.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE01A196DCAFB008D47C1 /* road_12.png */; };
 		4CDEE023196DCAFB008D47C1 /* road_13.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE01B196DCAFB008D47C1 /* road_13.png */; };
+		4CDEE02A196F1F05008D47C1 /* road_15.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE029196F1F05008D47C1 /* road_15.png */; };
 		4CE1E98F1960B69A00C076D1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE1E98E1960B69A00C076D1 /* QuartzCore.framework */; };
 		4CE1E9911960B69A00C076D1 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE1E9901960B69A00C076D1 /* OpenGLES.framework */; };
 		4CE1E9931960B69A00C076D1 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE1E9921960B69A00C076D1 /* OpenAL.framework */; };
@@ -275,6 +276,7 @@
 		4CDEE019196DCAFB008D47C1 /* road_11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = road_11.png; sourceTree = "<group>"; };
 		4CDEE01A196DCAFB008D47C1 /* road_12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = road_12.png; sourceTree = "<group>"; };
 		4CDEE01B196DCAFB008D47C1 /* road_13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = road_13.png; sourceTree = "<group>"; };
+		4CDEE029196F1F05008D47C1 /* road_15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = road_15.png; sourceTree = "<group>"; };
 		4CE1E98B1960B69A00C076D1 /* GameDraft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GameDraft.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE1E98E1960B69A00C076D1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		4CE1E9901960B69A00C076D1 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -735,6 +737,7 @@
 				4CDEE00A196C9C78008D47C1 /* road_3.png */,
 				4CDEE00B196C9C78008D47C1 /* road_5.png */,
 				4CDEE012196CC661008D47C1 /* road_14.png */,
+				4CDEE029196F1F05008D47C1 /* road_15.png */,
 				4C41FC0D19637FAD00D9D24A /* road_10.png */,
 				4C41FC0B19637FA100D9D24A /* road_9.png */,
 				4CDEE014196DCAFB008D47C1 /* road_0.png */,
@@ -1705,6 +1708,7 @@
 				4CE1E9BE1960B69A00C076D1 /* Icon-120.png in Resources */,
 				4CDEE013196CC661008D47C1 /* road_14.png in Resources */,
 				4CDEDFF21968D7B2008D47C1 /* car_small.png in Resources */,
+				4CDEE02A196F1F05008D47C1 /* road_15.png in Resources */,
 				4CE1EBC21960B69C00C076D1 /* LICENSE_CCBReader.txt in Resources */,
 				4CE1E9B41960B69A00C076D1 /* Icon@2x.png in Resources */,
 				4CE1E9C61960B69A00C076D1 /* Icon-Small@2x.png in Resources */,
