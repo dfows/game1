@@ -14,29 +14,75 @@
     int _numColumns;
     int _numRows;
     int _numNodes;
-    NSMutableArray *_adjMat; // adjacency matrix. // yo it's acting weird. can we print this shit out legit.
+    NSMutableArray *_allNodes;
 }
 
 - (id)init {
     self = [super init];
     if (self) {
         _map = [[NSMutableArray alloc] init];
-        _adjMat = [[NSMutableArray alloc] init];
+        _allNodes = [[NSMutableArray alloc] init];
         _numColumns = 4;
         _numRows = 3;
-        _numNodes = (_numColumns*_numRows) - ((_numColumns/2)*(_numRows/2));
+        _numNodes = _numColumns * _numRows;
         NSLog(@"width: %i, height: %i, numNodes: %i",_numColumns,_numRows,_numNodes);
         // initialize the data structure (NSMutableArray) that I am using to store cell information
-        // initialize the adjacency matrix to hold 0's
-        for (int j = 0; j < _numNodes; j++) {
-            _adjMat[j] = [NSMutableArray array];
-            for (int i = 0; i < _numNodes; i++) {
-                _adjMat[j][i] = [NSNumber numberWithInteger:0];
+        // initialize the matrix to hold 0's
+        for (int j = 0; j < _numRows; j++) {
+            _allNodes[j] = [NSMutableArray array];
+            for (int i = 0; i < _numColumns; i++) {
+                _allNodes[j][i] = [NSNumber numberWithInteger:15];
             }
         }
+        //NSLog(@"@",_allNodes);
+        [self createMaze];
         [self createMap];
     }
     return self;
+}
+
+- (void)createMaze {
+    // creates a maze using a maze algorithm i have found on the internet
+    
+    NSMutableArray *queue = [NSMutableArray array];
+    
+    [queue addObject:[NSNumber numberWithInt:0]]; // position 0,0
+    while ([queue count] != 0) {
+        // pop nodes (mark them)
+        NSNumber *current = [queue objectAtIndex:[queue count]-1];
+        [queue removeObject:current];
+        int currentNum = [current intValue];
+        //current cell's array row and col position
+        int c_row = currentNum/_numColumns;
+        int c_col = currentNum%_numColumns;
+        // if it's not rightmost
+        int cellType = [_allNodes[c_row][c_col] intValue];
+        if (c_col < _numColumns-1) {
+            if ((cellType >> 2) & 1) {
+                // knock down wall to immediate right neighbor
+                NSLog(@"knocking down own right wall. i am at %i, %i",c_row,c_col);
+                [self knockDownWall:4 atRow:c_row atCol:c_col];
+                // add its immediate right neighbor
+                [queue addObject:[NSNumber numberWithInt:currentNum+1]];
+                [self knockDownWall:1 atRow:c_row atCol:c_col+1]; // knock down the cell's west wall
+            }
+        }
+        if (c_row < _numRows-1) {
+            if ((cellType >> 3) & 1) { // if haven't knocked it down already
+                // knock down wall to above neighbor
+                [self knockDownWall:8 atRow:c_row atCol:c_col];
+                // and its above neighbor
+                [queue addObject:[NSNumber numberWithInt:currentNum+_numColumns]];
+                [self knockDownWall:2 atRow:c_row+1 atCol:c_col]; // knock down the cell's southern wall
+            }
+        }
+    }
+    //NSLog(_allNodes);
+}
+
+- (void)knockDownWall:(int)wallDir atRow:(int)rowNum atCol:(int)colNum {
+    NSNumber *currentCell = _allNodes[rowNum][colNum];
+    _allNodes[rowNum][colNum] = [NSNumber numberWithInt:[currentCell intValue]-wallDir];
 }
 
 - (void)createMap {
@@ -44,36 +90,13 @@
     for (int j = 0; j < _numRows; j++) {
         _map[j] = [NSMutableArray array]; // class method
         for (int i = 0; i < _numColumns; i++) {
-            if ((j*i)%2==0){
-                // if not at odd row and odd column, create sprite
-                // add more info here to streamline map generation
-                int bloktype = 0;
-                
-                // having a south border
-                if ((j==0) || (j%2==0 && i%2==1)) {
-                    bloktype += 2; // South is 2
-                }
-                // having a north border
-                if ((j==_numRows-1) || (j%2==0 && i%2==1)) {
-                    bloktype += 8; // North is 8
-                }
-                // having an east border
-                if ((i==_numColumns-1) || (j%2==1 && i%2==0)) {
-                    bloktype += 4; // East is 4
-                }
-                // having a west border
-                if ((i==0) || (j%2==1 && i%2==0)) {
-                    bloktype += 1; // West is 1
-                }
-                CCSprite *streetTile = [CCSprite spriteWithImageNamed:[NSString stringWithFormat:@"road_%i.png",bloktype]];
-                [_map[j] addObject:streetTile];
-                NSLog(@"CELL NUMBER %i is type %i",j*_numColumns+i,bloktype);
-            } else {
-                [_map[j] addObject:[NSNumber numberWithInteger:0]];
-            }
+            int bloktype = [_allNodes[j][i] intValue];
+            NSLog(@"bloktype %i",bloktype);
+            CCSprite *streetTile = [CCSprite spriteWithImageNamed:[NSString stringWithFormat:@"road_%i.png",bloktype]];
+            [_map[j] addObject:streetTile];
+            NSLog(@"CELL NUMBER %i is type %i",j*_numColumns+i,bloktype);
         }
     }
-    //NSLog(@"%@",_map);
 }
 
 /*- (void)initNodes {
@@ -145,9 +168,9 @@
 - (void)addAsNeighbor:(int)selfIdx atOtherIdx:(int)otherIdx {
     if (selfIdx > otherIdx) {
         //NSLog(@"added at %i,%i",selfIdx,otherIdx);
-        _adjMat[selfIdx][otherIdx] = [NSNumber numberWithInteger:1];
+        _allNodes[selfIdx][otherIdx] = [NSNumber numberWithInteger:1];
     } else {
-        _adjMat[otherIdx][selfIdx] = [NSNumber numberWithInteger:1];
+        _allNodes[otherIdx][selfIdx] = [NSNumber numberWithInteger:1];
     }
     //both
 //    _adjMat[selfIdx][otherIdx] = [NSNumber numberWithInteger:1];

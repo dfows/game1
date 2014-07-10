@@ -103,6 +103,7 @@
     [super onEnter];
     // load in the map piece
     CCSprite *mapPiece = [[_grid.map objectAtIndex:_currentTileRow] objectAtIndex:_currentTileCol];
+    
     CGRect screenBound = [[UIScreen mainScreen] bounds];
     CGSize screenSize = screenBound.size;
     CGFloat screenWidth = screenSize.width;
