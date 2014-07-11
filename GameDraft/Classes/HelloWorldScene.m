@@ -13,18 +13,21 @@
 #import "Car.h"
 #import "Bicycle.h"
 
+static float SCALE_AMT = .25;
+
 // -----------------------------------------------------------------------
 #pragma mark - HelloWorldScene
 // -----------------------------------------------------------------------
 
 @implementation HelloWorldScene
 {
-    CCSprite *_sprite;
-    int _currentTileRow, _currentTileCol;
-    Maze *_grid;
-    Street *_traffic;
-    CCPhysicsNode *_physicsNode;
-    Bicycle *_bike;
+    int _currentTileRow, _currentTileCol; // keeps track of current map piece with respect to array
+    CCSprite *_currentMapPiece; // keeps track of dimensions of current map piece
+    NSMutableArray *_currentlyLoadedPieces; // keeps track of map pieces that have been added to self as children
+    Maze *_grid; // sets up the map
+    Street *_traffic; // holds cars / obstacles
+    CCPhysicsNode *_physicsNode; // encloses objects that will collide
+    Bicycle *_bike; // main character
 }
 
 // -----------------------------------------------------------------------
@@ -42,6 +45,7 @@
 {
     if (self = [super init]) {
         // init stuff
+        // gesture recognizers for swiping
         UISwipeGestureRecognizer *swipeUptToDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleDownSwipeBoom:)];
         [swipeUptToDown setDirection:UISwipeGestureRecognizerDirectionDown];
         [swipeUptToDown setDelegate:self];
@@ -61,9 +65,12 @@
         _physicsNode = [CCPhysicsNode node];
         _physicsNode.collisionDelegate = self;
         _physicsNode.gravity = ccp(0,0);
+        
         _grid = [[Maze alloc] init];
         _currentTileRow = 0;
         _currentTileCol = 0;
+        _currentlyLoadedPieces = [NSMutableArray array];
+        
         _traffic = [[Street alloc] init];
         _bike = [[Bicycle alloc] init];
         _bike.position = ccp(240, 160);
@@ -102,18 +109,12 @@
     // always call super onEnter first
     [super onEnter];
     // load in the map piece
-    CCSprite *mapPiece = [[_grid.map objectAtIndex:_currentTileRow] objectAtIndex:_currentTileCol];
-    
+    [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
+    NSLog(@"preloaded in on enter");
     CGRect screenBound = [[UIScreen mainScreen] bounds];
     CGSize screenSize = screenBound.size;
     CGFloat screenWidth = screenSize.width;
     CGFloat screenHeight = screenSize.height;
-    mapPiece.anchorPoint = ccp(0,0);
-    mapPiece.position = ccp(0,0); //ccp(screenWidth/2,screenHeight/2);
-    mapPiece.scale = .25;
-    mapPiece.zOrder = -1;
-    [self addChild:mapPiece];
-    
     _physicsNode.contentSize = screenSize;
     CCActionFollow *follow = [CCActionFollow actionWithTarget:_bike];
     //CCLOG(@"%f,%f boudning",_physicsNode.boundingBox.size.width,_physicsNode.boundingBox.size.height);
@@ -124,16 +125,69 @@
 
 - (void)update:(CCTime)delta {
     [self detectObstacle];
-    NSLog(@"bike position: (%f,%f)",_bike.position.x,_bike.position.y);
     // when bike gets to left or right boundaries of the scene, turn map to the left or right (swivel entire screen)
+    // when _currentMapPiece reaches bottom of screen, generate surrounding ones around new _currentMapPiece
     
-    // preload surrounding map pieces when bike enters a map piece
-    // if (_bike.position.y > mapPiece????
+    //NSLog(@"currentmapppiece -%f < %f",_currentMapPiece.boundingBox.size.height, _currentMapPiece.position.y);
+    //CGPoint mapPos = [self convertToWorldSpace:_currentMapPiece.position];
+    //CGPoint bikeWPos = [self convertToWorldSpace:_bike.position];
+    //NSLog(@"bikePos: %f / bikeWPos: %f",_bike.position.y,bikeWPos.y);
+    
+    if (_bike.position.y > _currentMapPiece.position.y+self.contentSize.height) {
+        NSLog(@"moved up");
+        _currentTileRow++;
+        NSLog(@"currentTileRow: %i",_currentTileRow);
+        [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
+    }
+    /*
+    else if (_bike.position.y < _currentMapPiece.position.y) {
+        NSLog(@"moved down");
+        _currentTileRow--;
+    }
+    if (_bike.position.x > _currentMapPiece.position.x+self.contentSize.width) {
+        NSLog(@"moved right");
+        _currentTileCol++;
+    }
+    else if (_bike.position.x < _currentMapPiece.position.x) {
+        NSLog(@"moved left");
+        _currentTileCol--;
+    }*/
 }
 
-- (void)preloadSurroundingMap {
+- (void)clearPreloaded {
+    if ([_currentlyLoadedPieces count] == 0) {
+        return;
+    } else {
+        for (int i = (int)([_currentlyLoadedPieces count]-1); i >= 0; i--) {
+            [self removeChild:[_currentlyLoadedPieces objectAtIndex:i]];
+            [_currentlyLoadedPieces removeObjectAtIndex:i];
+        }
+    }
+}
+
+- (void)preloadSurroundingMapAtRow:(int)rowNum andCol:(int)colNum {
+    [self clearPreloaded];
     // add things to scene
-    //for (int i = )
+    int numRows = [_grid.map count];
+    int numCols = [[_grid.map objectAtIndex:0] count];
+    for (int j = rowNum-1; j <= rowNum+1; j++) {
+        if (j >= 0 && j < numRows) {
+            for (int i = colNum-1; i <= colNum+1; i++) {
+                if (i >= 0 && i < numCols) {
+                    // generate map tile and set its position to i*self.contentSize.width, j*self.contentSize.height
+                    CCSprite *piece = [[_grid.map objectAtIndex:j] objectAtIndex:i];
+                    piece.position = ccp(i*self.contentSize.width, j*self.contentSize.height);
+                    piece.scale = SCALE_AMT;
+                    piece.zOrder = -1;
+                    if (i == _currentTileCol && j == _currentTileRow) {
+                        _currentMapPiece = piece;
+                    }
+                    [_currentlyLoadedPieces addObject:piece];
+                    [self addChild:piece];
+                }
+            }
+        }
+    }
 }
 
 - (void)detectObstacle {
@@ -179,14 +233,7 @@
 // -----------------------------------------------------------------------
 
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
-    CGPoint touchLoc = [touch locationInNode:self];
-    
-    // Log touch location
-    CCLOG(@"Move sprite to @ %@",NSStringFromCGPoint(touchLoc));
-    
-    // Move our sprite to touch location
-    CCActionMoveTo *actionMove = [CCActionMoveTo actionWithDuration:1.0f position:touchLoc];
-    [_sprite runAction:actionMove];
+
 }
 
 - (void)handleRightSwipe:(UISwipeGestureRecognizer*)recognizer {

@@ -100,6 +100,7 @@
             int bloktype = [_allNodes[j][i] intValue];
             NSLog(@"bloktype %i",bloktype);
             CCSprite *streetTile = [CCSprite spriteWithImageNamed:[NSString stringWithFormat:@"road_%i.png",bloktype]];
+            streetTile.anchorPoint = ccp(0,0);
             [_map[j] addObject:streetTile];
             NSLog(@"CELL NUMBER %i is type %i",j*_numColumns+i,bloktype);
         }
