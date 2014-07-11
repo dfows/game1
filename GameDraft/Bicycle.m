@@ -17,7 +17,7 @@
     self = [super initWithImageNamed:@"bike_small.png"];
     if (self) {
         self.isBroken = NO;
-        self.velocity = 30;
+        self.velocity = 1;
         self.physicsBody = [CCPhysicsBody bodyWithCircleOfRadius:5.0f andCenter:ccp(0.5f, 0.5f)];
         self.physicsBody.collisionType = @"bike";
     }
@@ -38,7 +38,7 @@
     [self.physicsBody applyImpulse:ccp(0, _velocity*delta)];
     // check if hit, if so, image is now the broken bicycle.
     if (self.isBroken) {
-        [self setTexture:[[CCTextureCache sharedTextureCache] addImage:@"people.png"]];
+        [self setTexture:[[CCTextureCache sharedTextureCache] addImage:@"bleeding_bike.png"]];
     }
 }
 

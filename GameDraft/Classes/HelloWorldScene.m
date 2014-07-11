@@ -7,6 +7,7 @@
 //
 // -----------------------------------------------------------------------
 
+#import <CoreMotion/CoreMotion.h>
 #import "HelloWorldScene.h"
 #import "Maze.h"
 #import "Street.h"
@@ -25,9 +26,12 @@ static float SCALE_AMT = .25;
     CCSprite *_currentMapPiece; // keeps track of dimensions of current map piece
     NSMutableArray *_currentlyLoadedPieces; // keeps track of map pieces that have been added to self as children
     Maze *_grid; // sets up the map
+    
     Street *_traffic; // holds cars / obstacles
     CCPhysicsNode *_physicsNode; // encloses objects that will collide
     Bicycle *_bike; // main character
+    
+    CMMotionManager *_motionManager; // to track motion
 }
 
 // -----------------------------------------------------------------------
@@ -45,6 +49,10 @@ static float SCALE_AMT = .25;
 {
     if (self = [super init]) {
         // init stuff
+        // motion manager initialize
+        _motionManager = [[CMMotionManager alloc] init];
+        
+        /*
         // gesture recognizers for swiping
         UISwipeGestureRecognizer *swipeUptToDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleDownSwipeBoom:)];
         [swipeUptToDown setDirection:UISwipeGestureRecognizerDirectionDown];
@@ -61,6 +69,7 @@ static float SCALE_AMT = .25;
         [swipeRightToLeft setDirection:UISwipeGestureRecognizerDirectionLeft];
         [swipeRightToLeft setDelegate:self];
         [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeRightToLeft];
+         */
         
         _physicsNode = [CCPhysicsNode node];
         _physicsNode.collisionDelegate = self;
@@ -113,45 +122,73 @@ static float SCALE_AMT = .25;
     NSLog(@"preloaded in on enter");
     CGRect screenBound = [[UIScreen mainScreen] bounds];
     CGSize screenSize = screenBound.size;
-    CGFloat screenWidth = screenSize.width;
-    CGFloat screenHeight = screenSize.height;
+    
     _physicsNode.contentSize = screenSize;
     CCActionFollow *follow = [CCActionFollow actionWithTarget:_bike];
-    //CCLOG(@"%f,%f boudning",_physicsNode.boundingBox.size.width,_physicsNode.boundingBox.size.height);
     [self runAction:follow];
+    
+    // start tracking motion
+    [_motionManager startAccelerometerUpdates];
 }
 
 // -----------------------------------------------------------------------
 
 - (void)update:(CCTime)delta {
     [self detectObstacle];
-    // when bike gets to left or right boundaries of the scene, turn map to the left or right (swivel entire screen)
-    // when _currentMapPiece reaches bottom of screen, generate surrounding ones around new _currentMapPiece
+    
+    /* bicycle motion */
+    CMAccelerometerData *accelerometerData = _motionManager.accelerometerData;
+    CMAcceleration acceleration = accelerometerData.acceleration;
+    CGFloat newXPosition = _bike.position.x + acceleration.y * 1000 * delta;
+    NSLog(@"accel: (%f,%f,%f)",acceleration.x,acceleration.y, acceleration.z);
+    newXPosition = clampf(newXPosition, 0, self.contentSize.width*_grid.numCols);
+    CGFloat newYPosition = _bike.position.y;
+    newYPosition = clampf(newYPosition, 0, self.contentSize.height*_grid.numRows);
+    _bike.position = CGPointMake(newXPosition, newYPosition);
+    
+    // i also want to tilt the bike sprite in the direction that i am rotating the phone.
+    // i know the angle is atan2(accel.y/accel.x). convert it to degrees.
+    _bike.rotation = (atan2(acceleration.y,acceleration.x)*180.0/M_PI);
+
+    // acceleration
+    CGFloat zAcc = acceleration.z;
+    [_bike.physicsBody applyImpulse:ccp(0,-1*(.5+zAcc))];
+    
+    // when bike gets to left or right boundaries of the scene,
+    // detect if there is a wall there
+    // turn map to the left or right (swivel entire screen)
     
     //NSLog(@"currentmapppiece -%f < %f",_currentMapPiece.boundingBox.size.height, _currentMapPiece.position.y);
     //CGPoint mapPos = [self convertToWorldSpace:_currentMapPiece.position];
     //CGPoint bikeWPos = [self convertToWorldSpace:_bike.position];
     //NSLog(@"bikePos: %f / bikeWPos: %f",_bike.position.y,bikeWPos.y);
     
+    /* loading more map pieces */
     if (_bike.position.y > _currentMapPiece.position.y+self.contentSize.height) {
+        NSLog(@"bikePos: %f / _currentMPPos: %f",_bike.position.y,_currentMapPiece.position.y+self.contentSize.height);
         NSLog(@"moved up");
         _currentTileRow++;
         NSLog(@"currentTileRow: %i",_currentTileRow);
         [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
     }
-    /*
     else if (_bike.position.y < _currentMapPiece.position.y) {
         NSLog(@"moved down");
         _currentTileRow--;
+        NSLog(@"currentTileRow: %i",_currentTileRow);
+        [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
     }
     if (_bike.position.x > _currentMapPiece.position.x+self.contentSize.width) {
         NSLog(@"moved right");
         _currentTileCol++;
+        NSLog(@"currentTileRow: %i",_currentTileRow);
+        [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
     }
     else if (_bike.position.x < _currentMapPiece.position.x) {
         NSLog(@"moved left");
         _currentTileCol--;
-    }*/
+        NSLog(@"currentTileRow: %i",_currentTileRow);
+        [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
+    }
 }
 
 - (void)clearPreloaded {
@@ -168,8 +205,8 @@ static float SCALE_AMT = .25;
 - (void)preloadSurroundingMapAtRow:(int)rowNum andCol:(int)colNum {
     [self clearPreloaded];
     // add things to scene
-    int numRows = [_grid.map count];
-    int numCols = [[_grid.map objectAtIndex:0] count];
+    int numRows = _grid.numRows;
+    int numCols = _grid.numCols;
     for (int j = rowNum-1; j <= rowNum+1; j++) {
         if (j >= 0 && j < numRows) {
             for (int i = colNum-1; i <= colNum+1; i++) {
@@ -197,7 +234,7 @@ static float SCALE_AMT = .25;
         float distAway = ccpDistance(_bike.position,c.position);
         if (distAway < 50.0f) {
             if (arc4random()%10 < 9) { // 90% of the time there is no crash
-                c.velocity *= .5;
+                c.velocity *= .1;
             }
         }
     }
@@ -218,6 +255,9 @@ static float SCALE_AMT = .25;
     // always call super onExit last
     [super onExit];
     
+    [_motionManager stopAccelerometerUpdates];
+    
+    /*
     // not sure why i'm doing this part but the tutorial said to
     NSArray *grs = [[[CCDirector sharedDirector] view] gestureRecognizers];
     
@@ -226,6 +266,7 @@ static float SCALE_AMT = .25;
             [[[CCDirector sharedDirector] view] removeGestureRecognizer:gesture];
         }
     }
+     */
 }
 
 // -----------------------------------------------------------------------

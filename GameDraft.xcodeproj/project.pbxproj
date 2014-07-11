@@ -31,6 +31,13 @@
 		4CDEE022196DCAFB008D47C1 /* road_12.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE01A196DCAFB008D47C1 /* road_12.png */; };
 		4CDEE023196DCAFB008D47C1 /* road_13.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE01B196DCAFB008D47C1 /* road_13.png */; };
 		4CDEE02A196F1F05008D47C1 /* road_15.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE029196F1F05008D47C1 /* road_15.png */; };
+		4CDEE02C196FA6CF008D47C1 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CDEE02B196FA6CF008D47C1 /* CoreMotion.framework */; };
+		4CDEE03219709EE6008D47C1 /* bike_straight.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE02D19709EE6008D47C1 /* bike_straight.png */; };
+		4CDEE03319709EE6008D47C1 /* bike_turn.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE02E19709EE6008D47C1 /* bike_turn.png */; };
+		4CDEE03419709EE6008D47C1 /* tlight_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE02F19709EE6008D47C1 /* tlight_0.png */; };
+		4CDEE03519709EE6008D47C1 /* tlight_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE03019709EE6008D47C1 /* tlight_1.png */; };
+		4CDEE03619709EE6008D47C1 /* tlight_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE03119709EE6008D47C1 /* tlight_2.png */; };
+		4CDEE0381970A11E008D47C1 /* bleeding_bike.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE0371970A11E008D47C1 /* bleeding_bike.png */; };
 		4CE1E98F1960B69A00C076D1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE1E98E1960B69A00C076D1 /* QuartzCore.framework */; };
 		4CE1E9911960B69A00C076D1 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE1E9901960B69A00C076D1 /* OpenGLES.framework */; };
 		4CE1E9931960B69A00C076D1 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE1E9921960B69A00C076D1 /* OpenAL.framework */; };
@@ -277,6 +284,13 @@
 		4CDEE01A196DCAFB008D47C1 /* road_12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = road_12.png; sourceTree = "<group>"; };
 		4CDEE01B196DCAFB008D47C1 /* road_13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = road_13.png; sourceTree = "<group>"; };
 		4CDEE029196F1F05008D47C1 /* road_15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = road_15.png; sourceTree = "<group>"; };
+		4CDEE02B196FA6CF008D47C1 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		4CDEE02D19709EE6008D47C1 /* bike_straight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bike_straight.png; sourceTree = "<group>"; };
+		4CDEE02E19709EE6008D47C1 /* bike_turn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bike_turn.png; sourceTree = "<group>"; };
+		4CDEE02F19709EE6008D47C1 /* tlight_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tlight_0.png; sourceTree = "<group>"; };
+		4CDEE03019709EE6008D47C1 /* tlight_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tlight_1.png; sourceTree = "<group>"; };
+		4CDEE03119709EE6008D47C1 /* tlight_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tlight_2.png; sourceTree = "<group>"; };
+		4CDEE0371970A11E008D47C1 /* bleeding_bike.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bleeding_bike.png; sourceTree = "<group>"; };
 		4CE1E98B1960B69A00C076D1 /* GameDraft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GameDraft.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE1E98E1960B69A00C076D1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		4CE1E9901960B69A00C076D1 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -710,6 +724,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CDEE02C196FA6CF008D47C1 /* CoreMotion.framework in Frameworks */,
 				4CE1E9A51960B69A00C076D1 /* libObjectiveChipmunk.a in Frameworks */,
 				4CE1E9931960B69A00C076D1 /* OpenAL.framework in Frameworks */,
 				4CE1E9991960B69A00C076D1 /* UIKit.framework in Frameworks */,
@@ -748,6 +763,12 @@
 				4CDEE019196DCAFB008D47C1 /* road_11.png */,
 				4CDEE01A196DCAFB008D47C1 /* road_12.png */,
 				4CDEE01B196DCAFB008D47C1 /* road_13.png */,
+				4CDEE02D19709EE6008D47C1 /* bike_straight.png */,
+				4CDEE02E19709EE6008D47C1 /* bike_turn.png */,
+				4CDEE02F19709EE6008D47C1 /* tlight_0.png */,
+				4CDEE03019709EE6008D47C1 /* tlight_1.png */,
+				4CDEE03119709EE6008D47C1 /* tlight_2.png */,
+				4CDEE0371970A11E008D47C1 /* bleeding_bike.png */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -773,6 +794,7 @@
 		4CE1E98D1960B69A00C076D1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4CDEE02B196FA6CF008D47C1 /* CoreMotion.framework */,
 				4CE1E98E1960B69A00C076D1 /* QuartzCore.framework */,
 				4CE1E9901960B69A00C076D1 /* OpenGLES.framework */,
 				4CE1E9921960B69A00C076D1 /* OpenAL.framework */,
@@ -1707,14 +1729,17 @@
 				4C41FC0E19637FAD00D9D24A /* road_10.png in Resources */,
 				4CE1E9BE1960B69A00C076D1 /* Icon-120.png in Resources */,
 				4CDEE013196CC661008D47C1 /* road_14.png in Resources */,
+				4CDEE03319709EE6008D47C1 /* bike_turn.png in Resources */,
 				4CDEDFF21968D7B2008D47C1 /* car_small.png in Resources */,
 				4CDEE02A196F1F05008D47C1 /* road_15.png in Resources */,
 				4CE1EBC21960B69C00C076D1 /* LICENSE_CCBReader.txt in Resources */,
 				4CE1E9B41960B69A00C076D1 /* Icon@2x.png in Resources */,
 				4CE1E9C61960B69A00C076D1 /* Icon-Small@2x.png in Resources */,
 				4CDEE01F196DCAFB008D47C1 /* road_6.png in Resources */,
+				4CDEE0381970A11E008D47C1 /* bleeding_bike.png in Resources */,
 				4CDEE023196DCAFB008D47C1 /* road_13.png in Resources */,
 				4CE1E9B81960B69A00C076D1 /* Icon-72@2x.png in Resources */,
+				4CDEE03219709EE6008D47C1 /* bike_straight.png in Resources */,
 				4CE1E9A91960B69A00C076D1 /* Default.png in Resources */,
 				4CE1E9B21960B69A00C076D1 /* Icon.png in Resources */,
 				4CE1E9C01960B69A00C076D1 /* Icon-iPad-Spotlight-iOS7@2x.png in Resources */,
@@ -1729,12 +1754,15 @@
 				4CDEE021196DCAFB008D47C1 /* road_11.png in Resources */,
 				4CE1E9B61960B69A00C076D1 /* Icon-72.png in Resources */,
 				4CDEE022196DCAFB008D47C1 /* road_12.png in Resources */,
+				4CDEE03619709EE6008D47C1 /* tlight_2.png in Resources */,
 				4CE1EB041960B69B00C076D1 /* LICENSE_cocos2d.txt in Resources */,
 				4CDEDFF41968D8B5008D47C1 /* bike_small.png in Resources */,
 				4CE1E9AD1960B69A00C076D1 /* Default-568h@2x.png in Resources */,
 				4CDEE020196DCAFB008D47C1 /* road_7.png in Resources */,
+				4CDEE03419709EE6008D47C1 /* tlight_0.png in Resources */,
 				4CDEDFF01968D752008D47C1 /* car.png in Resources */,
 				4CE1E9CD1960B69A00C076D1 /* iTunesArtwork in Resources */,
+				4CDEE03519709EE6008D47C1 /* tlight_1.png in Resources */,
 				4CDEE01E196DCAFB008D47C1 /* road_4.png in Resources */,
 				4CDEE00D196C9C78008D47C1 /* road_5.png in Resources */,
 				4CE1E9C81960B69A00C076D1 /* Icon-Spotlight-iOS7.png in Resources */,

@@ -11,8 +11,8 @@
 
 @implementation Maze
 {
-    int _numColumns;
-    int _numRows;
+    //int _numColumns;
+    //int _numRows;
     int _numNodes;
     NSMutableArray *_allNodes;
 }
@@ -22,19 +22,18 @@
     if (self) {
         _map = [[NSMutableArray alloc] init];
         _allNodes = [[NSMutableArray alloc] init];
-        _numColumns = 4;
-        _numRows = 3;
-        _numNodes = _numColumns * _numRows;
-        NSLog(@"width: %i, height: %i, numNodes: %i",_numColumns,_numRows,_numNodes);
+        self.numCols = 4;
+        self.numRows = 3;
+        _numNodes = _numCols * _numRows;
+        NSLog(@"width: %i, height: %i, numNodes: %i",self.numCols,self.numRows,_numNodes);
         // initialize the data structure (NSMutableArray) that I am using to store cell information
-        // initialize the matrix to hold 0's
-        for (int j = 0; j < _numRows; j++) {
+        // initialize the matrix to hold 15's
+        for (int j = 0; j < self.numRows; j++) {
             _allNodes[j] = [NSMutableArray array];
-            for (int i = 0; i < _numColumns; i++) {
+            for (int i = 0; i < self.numCols; i++) {
                 _allNodes[j][i] = [NSNumber numberWithInteger:15];
             }
         }
-        //NSLog(@"@",_allNodes);
         [self createMaze];
         [self createMap];
     }
@@ -42,8 +41,6 @@
 }
 
 - (void)createMaze {
-    // creates a maze using a maze algorithm i have found on the internet
-    
     NSMutableArray *queue = [NSMutableArray array];
     
     [queue addObject:[NSNumber numberWithInt:0]]; // position 0,0
@@ -53,11 +50,11 @@
         [queue removeObject:current];
         int currentNum = [current intValue];
         //current cell's array row and col position
-        int c_row = currentNum/_numColumns;
-        int c_col = currentNum%_numColumns;
+        int c_row = currentNum/self.numCols;
+        int c_col = currentNum%self.numCols;
         // if it's not rightmost
         int cellType = [_allNodes[c_row][c_col] intValue];
-        if (c_col < _numColumns-1) {
+        if (c_col < self.numCols-1) {
             if ((cellType >> 2) & 1) {
                 // if its immediate right neighbor hasnt already had its west wall knocked down
                 int rightNeighbor = [_allNodes[c_row][c_col+1] intValue];
@@ -71,20 +68,19 @@
                 }
             }
         }
-        if (c_row < _numRows-1) {
+        if (c_row < self.numRows-1) {
             if ((cellType >> 3) & 1) { // if haven't knocked it down already
                 // knock down wall to above neighbor
                 [self knockDownWall:8 atRow:c_row atCol:c_col];
                 // and its above neighbor
                 int aboveNeighbor = [_allNodes[c_row+1][c_col] intValue];
                 if ((aboveNeighbor >> 1) & 1) {
-                    [queue addObject:[NSNumber numberWithInt:currentNum+_numColumns]];
+                    [queue addObject:[NSNumber numberWithInt:currentNum+self.numCols]];
                     [self knockDownWall:2 atRow:c_row+1 atCol:c_col]; // knock down the cell's southern wall
                 }
             }
         }
     }
-    //NSLog(_allNodes);
 }
 
 - (void)knockDownWall:(int)wallDir atRow:(int)rowNum atCol:(int)colNum {
@@ -96,94 +92,15 @@
     // put all nodes into _map
     for (int j = 0; j < _numRows; j++) {
         _map[j] = [NSMutableArray array]; // class method
-        for (int i = 0; i < _numColumns; i++) {
+        for (int i = 0; i < self.numCols; i++) {
             int bloktype = [_allNodes[j][i] intValue];
             NSLog(@"bloktype %i",bloktype);
             CCSprite *streetTile = [CCSprite spriteWithImageNamed:[NSString stringWithFormat:@"road_%i.png",bloktype]];
             streetTile.anchorPoint = ccp(0,0);
             [_map[j] addObject:streetTile];
-            NSLog(@"CELL NUMBER %i is type %i",j*_numColumns+i,bloktype);
+            NSLog(@"CELL NUMBER %i is type %i",j*self.numCols+i,bloktype);
         }
     }
-}
-
-/*- (void)initNodes {
-    for (int j = 0; j < _numRows; j++) {
-        int i = 0;
-        while (i < _numColumns) {
-            int current;
-            if (j%2==1) {
-                current = (j*_numColumns)-((j-1)*_numColumns/4)+(i/2);
-                // bottom neighbor
-                NSLog(@"bottom, oddrow");
-
-                int bottom = ((j-1)*_numColumns)-((j-1)*_numColumns/4)+i;
-                [self addAsNeighbor:current atOtherIdx:bottom];
-                if (j < _numRows-1) {
-                    NSLog(@"top, oddrow");
-
-                    // top neighbor
-                    int top = ((j+1)*_numColumns)-((j+1)*_numColumns/4)+i;
-                    [self addAsNeighbor:current atOtherIdx:top];
-                }
-                i+=2;
-            } else {
-                current = (j*_numColumns+i)-(j*_numColumns/4);
-                if (i%2==0) {
-                    if (j > 0) {
-                        NSLog(@"bottom, not oddrow");
-
-                        // bottom neighbor
-                        int bottom = ((j-1)*_numColumns)-((j-2)*_numColumns/4)+(i/2);
-                        [self addAsNeighbor:current atOtherIdx:bottom];
-                    }
-                    if (j < _numRows-1) {
-                        NSLog(@"top, not oddrow");
-
-                        // top neighbor
-                        int top = ((j+1)*_numColumns)-(j*_numColumns/4)+(i/2);
-                        [self addAsNeighbor:current atOtherIdx:top];
-                    }
-                }
-                if (i > 0) {
-                    NSLog(@"left");
-
-                    // left neighbor
-                    int left = current-1;
-                    [self addAsNeighbor:current atOtherIdx:left];
-                }
-                if (i < _numColumns-1) {
-                    // right neighbor
-                    NSLog(@"right");
-                    int right = current+1;
-                    [self addAsNeighbor:current atOtherIdx:right];
-                }
-                i++;
-            }
-        }
-    }
-    NSLog(@"myarray %@",_adjMat);
-//    for (int j = 0; j < _numNodes; j++) {
-//        NSMutableArray *ugh = [_adjMat objectAtIndex:j];
-//        NSMutableString *row;
-//        for (int i = 0; i < _numNodes; i++) {
-//            [row appendString:[NSString stringWithFormat:@" %@",[ugh objectAtIndex:j]]];
-//        }
-//        NSLog(row);
-//    }
-}*/
-
-- (void)addAsNeighbor:(int)selfIdx atOtherIdx:(int)otherIdx {
-    if (selfIdx > otherIdx) {
-        //NSLog(@"added at %i,%i",selfIdx,otherIdx);
-        _allNodes[selfIdx][otherIdx] = [NSNumber numberWithInteger:1];
-    } else {
-        _allNodes[otherIdx][selfIdx] = [NSNumber numberWithInteger:1];
-    }
-    //both
-//    _adjMat[selfIdx][otherIdx] = [NSNumber numberWithInteger:1];
-//    _adjMat[otherIdx][selfIdx] = [NSNumber numberWithInteger:1];
-    
 }
 
 // cells hold the followinginformation: which of its cardinal directions are blocked.
