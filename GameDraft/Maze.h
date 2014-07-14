@@ -12,6 +12,7 @@
 
 @property (assign) int numRows;
 @property (assign) int numCols;
+@property (strong, nonatomic) NSMutableArray *allNodes;
 @property (strong, nonatomic) NSMutableArray *map;
 
 @end

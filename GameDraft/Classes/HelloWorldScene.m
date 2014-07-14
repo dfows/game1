@@ -8,13 +8,14 @@
 // -----------------------------------------------------------------------
 
 #import <CoreMotion/CoreMotion.h>
+#import "CCTextureCache.h"
 #import "HelloWorldScene.h"
 #import "Maze.h"
 #import "Street.h"
 #import "Car.h"
 #import "Bicycle.h"
 
-static float SCALE_AMT = .25;
+static float SCALE_AMT = .28;
 
 // -----------------------------------------------------------------------
 #pragma mark - HelloWorldScene
@@ -120,10 +121,10 @@ static float SCALE_AMT = .25;
     // load in the map piece
     [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
     NSLog(@"preloaded in on enter");
-    CGRect screenBound = [[UIScreen mainScreen] bounds];
-    CGSize screenSize = screenBound.size;
+    int screenWidth = self.contentSize.width;
+    int screenHeight = self.contentSize.height;
     
-    _physicsNode.contentSize = screenSize;
+    _physicsNode.contentSize = CGSizeMake(_grid.numCols*screenWidth, _grid.numRows*screenHeight);//screenSize;
     CCActionFollow *follow = [CCActionFollow actionWithTarget:_bike];
     [self runAction:follow];
     
@@ -140,7 +141,7 @@ static float SCALE_AMT = .25;
     CMAccelerometerData *accelerometerData = _motionManager.accelerometerData;
     CMAcceleration acceleration = accelerometerData.acceleration;
     CGFloat newXPosition = _bike.position.x + acceleration.y * 1000 * delta;
-    NSLog(@"accel: (%f,%f,%f)",acceleration.x,acceleration.y, acceleration.z);
+    //NSLog(@"accel: (%f,%f,%f)",acceleration.x,acceleration.y, acceleration.z);
     newXPosition = clampf(newXPosition, 0, self.contentSize.width*_grid.numCols);
     CGFloat newYPosition = _bike.position.y;
     newYPosition = clampf(newYPosition, 0, self.contentSize.height*_grid.numRows);
@@ -155,7 +156,6 @@ static float SCALE_AMT = .25;
     [_bike.physicsBody applyImpulse:ccp(0,-1*(.5+zAcc))];
     
     // when bike gets to left or right boundaries of the scene,
-    // detect if there is a wall there
     // turn map to the left or right (swivel entire screen)
     
     //NSLog(@"currentmapppiece -%f < %f",_currentMapPiece.boundingBox.size.height, _currentMapPiece.position.y);
@@ -202,18 +202,32 @@ static float SCALE_AMT = .25;
     }
 }
 
+- (void)createWallAtX:(float)posX atY:(float)posY withWidth:(float)wallW andHeight:(float)wallH {
+    CCNode *wall = [CCNode node];
+    wall.position = ccp(posX,posY);
+    CGRect wallRect = CGRectMake(0,0,wallW,wallH);
+    wall.physicsBody = [CCPhysicsBody bodyWithRect:wallRect cornerRadius:0];
+    wall.physicsBody.type = CCPhysicsBodyTypeStatic;
+    wall.physicsBody.collisionType = @"wall";
+    [_physicsNode addChild:wall];
+}
+
 - (void)preloadSurroundingMapAtRow:(int)rowNum andCol:(int)colNum {
     [self clearPreloaded];
+    
     // add things to scene
     int numRows = _grid.numRows;
     int numCols = _grid.numCols;
+    int screenWidth = self.contentSize.width;
+    int screenHeight = self.contentSize.height;
+    
     for (int j = rowNum-1; j <= rowNum+1; j++) {
         if (j >= 0 && j < numRows) {
             for (int i = colNum-1; i <= colNum+1; i++) {
                 if (i >= 0 && i < numCols) {
                     // generate map tile and set its position to i*self.contentSize.width, j*self.contentSize.height
                     CCSprite *piece = [[_grid.map objectAtIndex:j] objectAtIndex:i];
-                    piece.position = ccp(i*self.contentSize.width, j*self.contentSize.height);
+                    piece.position = ccp(i*screenWidth, j*screenHeight);
                     piece.scale = SCALE_AMT;
                     piece.zOrder = -1;
                     if (i == _currentTileCol && j == _currentTileRow) {
@@ -221,6 +235,20 @@ static float SCALE_AMT = .25;
                     }
                     [_currentlyLoadedPieces addObject:piece];
                     [self addChild:piece];
+                    int bloktype = [_grid.allNodes[j][i] intValue];
+                    //NSLog(@"bloktype of cell at %i,%i is %i",j,i,bloktype);
+                    if ((bloktype >> 0) & 1) { // if having a west wall
+                        [self createWallAtX:(i*screenWidth) atY:(j*screenHeight) withWidth:100 andHeight:screenHeight];
+                    }
+                    if ((bloktype >> 1) & 1) { // if having a south wall
+                        [self createWallAtX:(i*screenWidth) atY:(j*screenHeight) withWidth:screenWidth andHeight:100];
+                    }
+                    if ((bloktype >> 2) & 1) { // if having a east wall
+                        [self createWallAtX:(((i+1)*screenWidth)-1) atY:(j*screenHeight) withWidth:100 andHeight:screenHeight];
+                    }
+                    if ((bloktype >> 3) & 1) { // if having a north wall
+                        [self createWallAtX:(i*screenWidth) atY:(((j+1)*screenHeight)-100) withWidth:screenWidth andHeight:100];
+                    }
                 }
             }
         }
@@ -245,6 +273,18 @@ static float SCALE_AMT = .25;
 - (BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair bike:(Bicycle *)player car:(CCNode *)enemy {
     NSLog(@"FIX BIKE! REPAIR NEEDED");
     player.isBroken = YES;
+    return TRUE;
+}
+
+- (BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair bike:(Bicycle *)player wall:(CCNode *)aWall {
+    NSLog(@"you biked into a wall you are stupid");
+    float energy = [pair totalKineticEnergy];
+    // if energy is large enough, make penguin static
+    if (energy > 10000.f) {
+        NSLog(@"FIX BIKE! REPAIR NEEDED");
+        player.isBroken = YES;
+        energy = 0;
+    }
     return TRUE;
 }
 

@@ -38,6 +38,8 @@
 		4CDEE03519709EE6008D47C1 /* tlight_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE03019709EE6008D47C1 /* tlight_1.png */; };
 		4CDEE03619709EE6008D47C1 /* tlight_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE03119709EE6008D47C1 /* tlight_2.png */; };
 		4CDEE0381970A11E008D47C1 /* bleeding_bike.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE0371970A11E008D47C1 /* bleeding_bike.png */; };
+		4CDEE03C19747A83008D47C1 /* inventory1.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE03B19747A83008D47C1 /* inventory1.png */; };
+		4CDEE03E19747C1C008D47C1 /* wall1.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CDEE03D19747C1C008D47C1 /* wall1.png */; };
 		4CE1E98F1960B69A00C076D1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE1E98E1960B69A00C076D1 /* QuartzCore.framework */; };
 		4CE1E9911960B69A00C076D1 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE1E9901960B69A00C076D1 /* OpenGLES.framework */; };
 		4CE1E9931960B69A00C076D1 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE1E9921960B69A00C076D1 /* OpenAL.framework */; };
@@ -291,6 +293,8 @@
 		4CDEE03019709EE6008D47C1 /* tlight_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tlight_1.png; sourceTree = "<group>"; };
 		4CDEE03119709EE6008D47C1 /* tlight_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tlight_2.png; sourceTree = "<group>"; };
 		4CDEE0371970A11E008D47C1 /* bleeding_bike.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bleeding_bike.png; sourceTree = "<group>"; };
+		4CDEE03B19747A83008D47C1 /* inventory1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = inventory1.png; path = ../../../Documents/inventory1.png; sourceTree = "<group>"; };
+		4CDEE03D19747C1C008D47C1 /* wall1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wall1.png; sourceTree = "<group>"; };
 		4CE1E98B1960B69A00C076D1 /* GameDraft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GameDraft.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CE1E98E1960B69A00C076D1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		4CE1E9901960B69A00C076D1 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -747,6 +751,7 @@
 				4CDEDFF31968D8B5008D47C1 /* bike_small.png */,
 				4C41FC0919637B6A00D9D24A /* road_8.png */,
 				4CDEDFF11968D7B2008D47C1 /* car_small.png */,
+				4CDEE03B19747A83008D47C1 /* inventory1.png */,
 				4CDEDFEF1968D752008D47C1 /* car.png */,
 				4CDEE010196CC642008D47C1 /* road_2.png */,
 				4CDEE00A196C9C78008D47C1 /* road_3.png */,
@@ -768,6 +773,7 @@
 				4CDEE02F19709EE6008D47C1 /* tlight_0.png */,
 				4CDEE03019709EE6008D47C1 /* tlight_1.png */,
 				4CDEE03119709EE6008D47C1 /* tlight_2.png */,
+				4CDEE03D19747C1C008D47C1 /* wall1.png */,
 				4CDEE0371970A11E008D47C1 /* bleeding_bike.png */,
 			);
 			name = Images;
@@ -1727,6 +1733,7 @@
 			files = (
 				4CE1E9AB1960B69A00C076D1 /* Default@2x.png in Resources */,
 				4C41FC0E19637FAD00D9D24A /* road_10.png in Resources */,
+				4CDEE03C19747A83008D47C1 /* inventory1.png in Resources */,
 				4CE1E9BE1960B69A00C076D1 /* Icon-120.png in Resources */,
 				4CDEE013196CC661008D47C1 /* road_14.png in Resources */,
 				4CDEE03319709EE6008D47C1 /* bike_turn.png in Resources */,
@@ -1771,6 +1778,7 @@
 				4CE1EC301960B69D00C076D1 /* LICENSE_Chipmunk.txt in Resources */,
 				4CDEE01D196DCAFB008D47C1 /* road_1.png in Resources */,
 				4CE1E9CA1960B69A00C076D1 /* Icon-Spotlight-iOS7@2x.png in Resources */,
+				4CDEE03E19747C1C008D47C1 /* wall1.png in Resources */,
 				4CE1E9BA1960B69A00C076D1 /* Icon-76.png in Resources */,
 				4CE1EB901960B69C00C076D1 /* ChangeLog in Resources */,
 				4CE1E9CF1960B69A00C076D1 /* iTunesArtwork@2x in Resources */,
