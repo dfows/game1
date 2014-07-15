@@ -270,16 +270,18 @@ static float SCALE_AMT = .28;
 
 // -----------------------------------------------------------------------
 
-- (BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair bike:(Bicycle *)player car:(CCNode *)enemy {
+- (BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair bike:(Bicycle *)player car:(Car *)enemy {
     NSLog(@"FIX BIKE! REPAIR NEEDED");
     player.isBroken = YES;
+    player.velocity = 0;
+    enemy.velocity = 0;
     return TRUE;
 }
 
 - (BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair bike:(Bicycle *)player wall:(CCNode *)aWall {
     NSLog(@"you biked into a wall you are stupid");
     float energy = [pair totalKineticEnergy];
-    // if energy is large enough, make penguin static
+    // if impact is high enough, kill bike
     if (energy > 10000.f) {
         NSLog(@"FIX BIKE! REPAIR NEEDED");
         player.isBroken = YES;
