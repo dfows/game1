@@ -24,21 +24,14 @@
     return self;
 }
 
-- (void)moveLeft {
-    // move left
-    self.position = ccp(self.position.x - 50, self.position.y);
-}
-
-- (void)moveRight {
-    // move right
-    self.position = ccp(self.position.x + 50, self.position.y);
-}
-
 - (void)update:(CCTime)delta {
-    [self.physicsBody applyImpulse:ccp(0, _velocity*delta)];
-    // check if hit, if so, image is now the broken bicycle.
+    // check if hit, if so, image is now the broken bicycle, and it also should stop. then game over should occur
     if (self.isBroken) {
         [self setTexture:[[CCTextureCache sharedTextureCache] addImage:@"bleeding_bike.png"]];
+        self.physicsBody.friction = 1.0;
+    } else {
+        // move as normal
+        [self.physicsBody applyImpulse:ccp(0, _velocity*delta)];
     }
 }
 

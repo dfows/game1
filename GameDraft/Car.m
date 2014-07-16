@@ -16,15 +16,21 @@
 - (id)init {
     self = [super initWithImageNamed:@"car_small.png"];
     if (self) {
-        self.velocity = arc4random()%50 + 30;
+        self.maxVelocity = arc4random()%50 + 30;
+        self.velocity = self.maxVelocity;
         self.physicsBody = [CCPhysicsBody bodyWithCircleOfRadius:20.0f andCenter:ccp(0.5f, 0.5f)];
+        self.physicsBody.density = 10.0;
         self.physicsBody.collisionType = @"car";
     }
     return self;
 }
 
 - (void)update:(CCTime)delta {
-    [self.physicsBody applyImpulse:ccp(0, _velocity*delta)];
+    if (self.hasCrashed) {
+        NSLog(@"ded");
+        self.physicsBody.friction = 1.0;
+    } else {
+        [self.physicsBody applyImpulse:ccp(0, _velocity*delta)];
     //self.position = ccp(self.position.x, self.position.y+_velocity*delta);
     // if there's space in front, move 1 velocity.
     // i need a timer to record ticks
@@ -33,10 +39,12 @@
 //    if (_spaceInFront) {
 //        
 //    }
+    }
 }
 
 - (BOOL)isOffScreen {
-    return (self.position.y > 320.0f+25);
+    //NSLog(@"CAR OFF SCREEN, parent contentsize height is %f",self.parent.parent.contentSize.height);
+    return (self.position.y > self.parent.parent.contentSize.height+25);
 }
 
 @end

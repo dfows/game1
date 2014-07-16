@@ -10,7 +10,9 @@
 
 @interface Car : CCSprite
 
+@property (assign) float maxVelocity;
 @property (assign) float velocity;
+@property (assign) BOOL hasCrashed;
 - (BOOL)isOffScreen;
 
 @end

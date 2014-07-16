@@ -14,7 +14,5 @@
 @property (assign) float velocity;
 
 - (BOOL)isOffScreen;
-- (void)moveRight;
-- (void)moveLeft;
 
 @end
