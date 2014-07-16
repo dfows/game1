@@ -64,7 +64,6 @@ static float SCALE_AMT = .28;
         _currentlyLoadedPieces = [NSMutableArray array];
         
         _traffic = [[Street alloc] init];
-        _traffic.anchorPoint = ccp(0.5,0.5);
         _bike = [[Bicycle alloc] init];
         _bike.position = ccp(240, 100);
         [_traffic addChild:_bike];
@@ -107,7 +106,7 @@ static float SCALE_AMT = .28;
     int screenHeight = self.contentSize.height;
     
     _physicsNode.contentSize = CGSizeMake(_grid.numCols*screenWidth, _grid.numRows*screenHeight);//screenSize;
-    CCActionFollow *follow = [CCActionFollow actionWithTarget:_traffic];
+    CCActionFollow *follow = [CCActionFollow actionWithTarget:_bike];
     [self runAction:follow];
     
     NSLog(@"physnode position is: %f,%f and its anchor point is at %f,%f", _physicsNode.position.x,_physicsNode.position.y,_physicsNode.anchorPoint.x,_physicsNode.anchorPoint.y);
@@ -127,12 +126,12 @@ static float SCALE_AMT = .28;
     /* bicycle motion */
     CMAccelerometerData *accelerometerData = _motionManager.accelerometerData;
     CMAcceleration acceleration = accelerometerData.acceleration;
-    CGFloat newXPosition = _traffic.position.x + acceleration.y * 1000 * delta;
+    CGFloat newXPosition = _bike.position.x + acceleration.y * 1000 * delta;
     //NSLog(@"accel: (%f,%f,%f)",acceleration.x,acceleration.y, acceleration.z);
     newXPosition = clampf(newXPosition, 0, self.contentSize.width*_grid.numCols);
-    CGFloat newYPosition = _traffic.position.y;
+    CGFloat newYPosition = _bike.position.y;
     newYPosition = clampf(newYPosition, 0, self.contentSize.height*_grid.numRows);
-    _traffic.position = CGPointMake(newXPosition, newYPosition);
+    _bike.position = CGPointMake(newXPosition, newYPosition);
     
     // i also want to tilt the bike sprite in the direction that i am rotating the phone.
     // i know the angle is atan2(accel.y/accel.x). convert it to degrees.
