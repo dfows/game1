@@ -34,7 +34,7 @@
         for (int i = 0; i < 4; i++) {
              // make new car obj.
             CGFloat carx = (screenWidth/4)*(i+1)+50;
-            CGFloat cary = -100;
+            CGFloat cary = 100;
             [self makeCarAtX:carx AtY:cary];
         }
     }
@@ -49,6 +49,8 @@
 }
 
 - (void)update:(CCTime)delta {
+    // have cars turn when they detect a wall / at random
+
     // remove any cars that have disappeared off the screen
     for (int i = (int)[self.cars count]-1; i >= 0; i--) {
         Car *car = [self.cars objectAtIndex:i];
@@ -56,7 +58,7 @@
             float carx = car.position.x;
             [self.cars removeObjectAtIndex:i];
             [self removeChild:car];
-            [self makeCarAtX:carx AtY:-100];
+            [self makeCarAtX:carx AtY:100];
         }
     }
 }

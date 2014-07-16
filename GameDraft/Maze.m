@@ -97,7 +97,7 @@
         self.map[j] = [NSMutableArray array]; // class method
         for (int i = 0; i < self.numCols; i++) {
             int bloktype = [self.allNodes[j][i] intValue];
-            NSLog(@"CELL NUMBER %i is type %i",j*self.numCols+i,bloktype);
+            //NSLog(@"CELL NUMBER %i is type %i",j*self.numCols+i,bloktype);
             CCSprite *streetTile = [CCSprite spriteWithImageNamed:[NSString stringWithFormat:@"road_%i.png",bloktype]];
             streetTile.anchorPoint = ccp(0,0);
             [self.map[j] addObject:streetTile];

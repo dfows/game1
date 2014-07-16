@@ -9,6 +9,7 @@
 
 #import <CoreMotion/CoreMotion.h>
 #import "CCTextureCache.h"
+#import "GameOverScene.h"
 #import "HelloWorldScene.h"
 #import "Maze.h"
 #import "Street.h"
@@ -53,25 +54,6 @@ static float SCALE_AMT = .28;
         // motion manager initialize
         _motionManager = [[CMMotionManager alloc] init];
         
-        /*
-        // gesture recognizers for swiping
-        UISwipeGestureRecognizer *swipeUptToDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleDownSwipeBoom:)];
-        [swipeUptToDown setDirection:UISwipeGestureRecognizerDirectionDown];
-        [swipeUptToDown setDelegate:self];
-        [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeUptToDown];
-
-        
-        UISwipeGestureRecognizer *swipeLeftToRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleLeftSwipe:)];
-        [swipeLeftToRight setDirection:UISwipeGestureRecognizerDirectionRight];
-        [swipeLeftToRight setDelegate:self];
-        [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeLeftToRight];
-        
-        UISwipeGestureRecognizer *swipeRightToLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleRightSwipe:)];
-        [swipeRightToLeft setDirection:UISwipeGestureRecognizerDirectionLeft];
-        [swipeRightToLeft setDelegate:self];
-        [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeRightToLeft];
-         */
-        
         _physicsNode = [CCPhysicsNode node];
         _physicsNode.collisionDelegate = self;
         _physicsNode.gravity = ccp(0,0);
@@ -82,12 +64,12 @@ static float SCALE_AMT = .28;
         _currentlyLoadedPieces = [NSMutableArray array];
         
         _traffic = [[Street alloc] init];
+        _traffic.anchorPoint = ccp(0.5,0.5);
         _bike = [[Bicycle alloc] init];
-        _bike.position = ccp(240, 160);
+        _bike.position = ccp(240, 100);
         [_traffic addChild:_bike];
         [_physicsNode addChild:_traffic];
         [self addChild:_physicsNode];
-        
         NSLog(@"created stuff");
     }
     return self;
@@ -125,8 +107,13 @@ static float SCALE_AMT = .28;
     int screenHeight = self.contentSize.height;
     
     _physicsNode.contentSize = CGSizeMake(_grid.numCols*screenWidth, _grid.numRows*screenHeight);//screenSize;
-    CCActionFollow *follow = [CCActionFollow actionWithTarget:_bike];
+    CCActionFollow *follow = [CCActionFollow actionWithTarget:_traffic];
     [self runAction:follow];
+    
+    NSLog(@"physnode position is: %f,%f and its anchor point is at %f,%f", _physicsNode.position.x,_physicsNode.position.y,_physicsNode.anchorPoint.x,_physicsNode.anchorPoint.y);
+    NSLog(@"traffic position is: %f,%f and its anchor point is at %f,%f", _traffic.position.x,_traffic.position.y,_traffic.anchorPoint.x,_traffic.anchorPoint.y);
+    NSLog(@"bike position is: %f,%f and its anchor point is at %f,%f", _bike.position.x,_bike.position.y,_bike.anchorPoint.x,_bike.anchorPoint.y);
+    
     
     // start tracking motion
     [_motionManager startAccelerometerUpdates];
@@ -140,12 +127,12 @@ static float SCALE_AMT = .28;
     /* bicycle motion */
     CMAccelerometerData *accelerometerData = _motionManager.accelerometerData;
     CMAcceleration acceleration = accelerometerData.acceleration;
-    CGFloat newXPosition = _bike.position.x + acceleration.y * 1000 * delta;
+    CGFloat newXPosition = _traffic.position.x + acceleration.y * 1000 * delta;
     //NSLog(@"accel: (%f,%f,%f)",acceleration.x,acceleration.y, acceleration.z);
     newXPosition = clampf(newXPosition, 0, self.contentSize.width*_grid.numCols);
-    CGFloat newYPosition = _bike.position.y;
+    CGFloat newYPosition = _traffic.position.y;
     newYPosition = clampf(newYPosition, 0, self.contentSize.height*_grid.numRows);
-    _bike.position = CGPointMake(newXPosition, newYPosition);
+    _traffic.position = CGPointMake(newXPosition, newYPosition);
     
     // i also want to tilt the bike sprite in the direction that i am rotating the phone.
     // i know the angle is atan2(accel.y/accel.x). convert it to degrees.
@@ -262,7 +249,8 @@ static float SCALE_AMT = .28;
         float distAway = ccpDistance(_bike.position,c.position);
         if (distAway < 50.0f) {
             if (arc4random()%10 < 9) { // 90% of the time there is no crash
-                c.velocity *= .1;
+                c.physicsBody.friction += 0.1;
+                c.velocity = pow(distAway,2)/c.maxVelocity;
             }
         }
     }
@@ -271,23 +259,33 @@ static float SCALE_AMT = .28;
 // -----------------------------------------------------------------------
 
 - (BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair bike:(Bicycle *)player car:(Car *)enemy {
-    NSLog(@"FIX BIKE! REPAIR NEEDED");
-    player.isBroken = YES;
-    player.velocity = 0;
-    enemy.velocity = 0;
+    [self becomeIncapacitated];
+    enemy.hasCrashed = YES;
+    [_motionManager stopAccelerometerUpdates];
+    
+    [self scheduleOnce:@selector(endGame) delay:2.0f];
     return TRUE;
 }
 
+- (void)endGame {
+    [[CCDirector sharedDirector] replaceScene:[GameOverScene scene]];
+}
+
 - (BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair bike:(Bicycle *)player wall:(CCNode *)aWall {
-    NSLog(@"you biked into a wall you are stupid");
+    NSLog(@"you biked into the sidewalks you are stupid");
     float energy = [pair totalKineticEnergy];
     // if impact is high enough, kill bike
     if (energy > 10000.f) {
-        NSLog(@"FIX BIKE! REPAIR NEEDED");
-        player.isBroken = YES;
+        [self becomeIncapacitated];
         energy = 0;
     }
     return TRUE;
+}
+
+- (void)becomeIncapacitated {
+    [_motionManager stopAccelerometerUpdates];
+    NSLog(@"FIX BIKE! REPAIR NEEDED");
+    _bike.isBroken = YES;
 }
 
 // -----------------------------------------------------------------------
@@ -298,17 +296,6 @@ static float SCALE_AMT = .28;
     [super onExit];
     
     [_motionManager stopAccelerometerUpdates];
-    
-    /*
-    // not sure why i'm doing this part but the tutorial said to
-    NSArray *grs = [[[CCDirector sharedDirector] view] gestureRecognizers];
-    
-    for (UIGestureRecognizer *gesture in grs){
-        if([gesture isKindOfClass:[UISwipeGestureRecognizer class]]){
-            [[[CCDirector sharedDirector] view] removeGestureRecognizer:gesture];
-        }
-    }
-     */
 }
 
 // -----------------------------------------------------------------------
@@ -319,36 +306,10 @@ static float SCALE_AMT = .28;
 
 }
 
-- (void)handleRightSwipe:(UISwipeGestureRecognizer*)recognizer {
-    NSLog(@"right swpipe"); //change this to accelerometer
-    // is there a way to get how much swiping was done / how strong/fast the swipe was
-    [_bike moveLeft];
-}
-
-- (void)handleLeftSwipe:(UISwipeGestureRecognizer*)recognizer {
-    NSLog(@"left swipe");
-    [_bike moveRight];
-}
-
-- (void)handleDownSwipeBoom:(UISwipeGestureRecognizer*)recognizer {
-    NSLog(@"restarting");
-    // restart this scene
-//    CCTransition *transition = [CCTransition transitionFadeWithDuration:0.8f];
-//    [[CCDirector sharedDirector] presentScene:@"HelloWorldScene" withTransition:transition];
-}
-
 // -----------------------------------------------------------------------
 #pragma mark - Button Callbacks
 // -----------------------------------------------------------------------
 
-- (void)onBackClicked:(id)sender
-{
-    // back to intro scene with transition
-    /*
-    [[CCDirector sharedDirector] replaceScene:[IntroScene scene]
-                               withTransition:[CCTransition transitionPushWithDirection:CCTransitionDirectionRight duration:1.0f]];
-     */
-}
 
 // -----------------------------------------------------------------------
 @end

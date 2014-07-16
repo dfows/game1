@@ -8,7 +8,7 @@
 // -----------------------------------------------------------------------
 
 #import "AppDelegate.h"
-#import "HelloWorldScene.h"
+#import "IntroScene.h"
 
 @implementation AppDelegate
 
@@ -48,7 +48,7 @@
 -(CCScene *)startScene
 {
 	// This method should return the very first scene to be run when your app starts.
-	return [HelloWorldScene scene];
+	return [IntroScene scene];
 }
 
 @end
