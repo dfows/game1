@@ -39,6 +39,10 @@
     // check if hit, if so, image is now the broken bicycle.
     if (self.isBroken) {
         [self setTexture:[[CCTextureCache sharedTextureCache] addImage:@"bleeding_bike.png"]];
+        self.physicsBody.friction = 1.0;
+    } else {
+        // move as normal
+        //[self.physicsBody applyImpulse:ccp(0, _velocity*delta)];
     }
 }
 

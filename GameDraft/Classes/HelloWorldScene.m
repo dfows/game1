@@ -33,6 +33,7 @@ static float SCALE_AMT = .28;
     Bicycle *_bike; // main character
     
     CMMotionManager *_motionManager; // to track motion
+    float smooth_x, smooth_y;
 }
 
 // -----------------------------------------------------------------------
@@ -49,6 +50,7 @@ static float SCALE_AMT = .28;
 - (id)init
 {
     if (self = [super init]) {
+        self.anchorPoint = ccp(0.5,0.5);
         // init stuff
         // motion manager initialize
         _motionManager = [[CMMotionManager alloc] init];
@@ -83,7 +85,7 @@ static float SCALE_AMT = .28;
         
         _traffic = [[Street alloc] init];
         _bike = [[Bicycle alloc] init];
-        _bike.position = ccp(240, 160);
+        _bike.position = ccp(self.contentSize.width/2, self.contentSize.height/2);
         [_traffic addChild:_bike];
         [_physicsNode addChild:_traffic];
         [self addChild:_physicsNode];
@@ -137,7 +139,7 @@ static float SCALE_AMT = .28;
 - (void)update:(CCTime)delta {
     [self detectObstacle];
     
-    /* bicycle motion */
+    /* motion */
     CMAccelerometerData *accelerometerData = _motionManager.accelerometerData;
     CMAcceleration acceleration = accelerometerData.acceleration;
     CGFloat newXPosition = _bike.position.x + acceleration.y * 1000 * delta;
@@ -145,15 +147,30 @@ static float SCALE_AMT = .28;
     newXPosition = clampf(newXPosition, 0, self.contentSize.width*_grid.numCols);
     CGFloat newYPosition = _bike.position.y;
     newYPosition = clampf(newYPosition, 0, self.contentSize.height*_grid.numRows);
-    _bike.position = CGPointMake(newXPosition, newYPosition);
+    //_bike.position = CGPointMake(newXPosition, newYPosition);
+    _bike.position = ccp(self.contentSize.width/2,self.contentSize.height/2);
     
-    // i also want to tilt the bike sprite in the direction that i am rotating the phone.
+    // convert bike to world and then node, and then to the map node?
+    CGPoint bikeWPos = [self convertToWorldSpace:_bike.position];
+    CGPoint mapWPos = ccp(self.anchorPoint.x*self.contentSize.width,self.anchorPoint.y*self.contentSize.height);
+    NSLog(@"bikeWPos: %f,%f / mapWPos: %f,%f",bikeWPos.x,bikeWPos.y,mapWPos.x,mapWPos.y);
+    
+    // set self.anchorpoint to bike position so that the map can pivot about that
+    
+    // should alwyas be positioned in center of screen from the anchor point
+    self.position = ccp(self.contentSize.width/2, self.contentSize.height/2);
+    
+    // i also want to tilt the map sprite in the direction that i am rotating the phone.
     // i know the angle is atan2(accel.y/accel.x). convert it to degrees.
-    _bike.rotation = (atan2(acceleration.y,acceleration.x)*180.0/M_PI);
+    float smoothingFactor = 0.85;
+    smooth_x = smoothingFactor*smooth_x + (1.0-smoothingFactor)*acceleration.x;
+    smooth_y = smoothingFactor*smooth_y + (1.0-smoothingFactor)*acceleration.y;
+    self.rotation = -1*(atan2(smooth_y,smooth_x)*180.0/(2*M_PI)); // angle edge case still needs to be fixed
 
     // acceleration
-    CGFloat zAcc = acceleration.z;
-    [_bike.physicsBody applyImpulse:ccp(0,-1*(.5+zAcc))];
+    CGFloat zAcc = 1+abs(acceleration.z);
+    [_bike.physicsBody applyImpulse:ccp(0,zAcc*delta)];
+    self.anchorPoint = ccp(newXPosition/self.contentSize.width,zAcc*pow(delta,2)+self.anchorPoint.y);
     
     // when bike gets to left or right boundaries of the scene,
     // turn map to the left or right (swivel entire screen)
@@ -178,12 +195,14 @@ static float SCALE_AMT = .28;
         [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
     }
     if (_bike.position.x > _currentMapPiece.position.x+self.contentSize.width) {
+        //self.anchorPoint = ccp(bikeWPos.x/self.contentSize.width, bikeWPos.y/self.contentSize.height);
         NSLog(@"moved right");
         _currentTileCol++;
         NSLog(@"currentTileRow: %i",_currentTileRow);
         [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
     }
     else if (_bike.position.x < _currentMapPiece.position.x) {
+        //self.anchorPoint = ccp(bikeWPos.x/self.contentSize.width, bikeWPos.y/self.contentSize.height);
         NSLog(@"moved left");
         _currentTileCol--;
         NSLog(@"currentTileRow: %i",_currentTileRow);

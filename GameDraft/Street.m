@@ -33,8 +33,8 @@
         //for (int i = 0; i < self.numLanes; i++) {
         for (int i = 0; i < 4; i++) {
              // make new car obj.
-            CGFloat carx = (screenWidth/4)*(i+1)+50;
-            CGFloat cary = -100;
+            CGFloat carx = (screenWidth/4)*(i+1)+100;
+            CGFloat cary = 0;
             [self makeCarAtX:carx AtY:cary];
         }
     }
@@ -56,7 +56,7 @@
             float carx = car.position.x;
             [self.cars removeObjectAtIndex:i];
             [self removeChild:car];
-            [self makeCarAtX:carx AtY:-100];
+            [self makeCarAtX:carx AtY:0];
         }
     }
 }
