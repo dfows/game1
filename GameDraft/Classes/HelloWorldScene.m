@@ -34,6 +34,7 @@ static float SCALE_AMT = .28;
     Bicycle *_bike; // main character
     
     CMMotionManager *_motionManager; // to track motion
+    float smooth_x, smooth_y;
 }
 
 // -----------------------------------------------------------------------
@@ -50,6 +51,7 @@ static float SCALE_AMT = .28;
 - (id)init
 {
     if (self = [super init]) {
+        self.anchorPoint = ccp(0.5,0.5);
         // init stuff
         // motion manager initialize
         _motionManager = [[CMMotionManager alloc] init];
@@ -57,6 +59,7 @@ static float SCALE_AMT = .28;
         _physicsNode = [CCPhysicsNode node];
         _physicsNode.collisionDelegate = self;
         _physicsNode.gravity = ccp(0,0);
+        _physicsNode.contentSize = CGSizeMake(_grid.numCols*self.contentSize.width, _grid.numRows*self.contentSize.height);
         
         _grid = [[Maze alloc] init];
         _currentTileRow = 0;
@@ -65,7 +68,7 @@ static float SCALE_AMT = .28;
         
         _traffic = [[Street alloc] init];
         _bike = [[Bicycle alloc] init];
-        _bike.position = ccp(240, 100);
+        _bike.position = ccp(self.contentSize.width/2, self.contentSize.height/2);
         [_traffic addChild:_bike];
         [_physicsNode addChild:_traffic];
         [self addChild:_physicsNode];
@@ -104,8 +107,7 @@ static float SCALE_AMT = .28;
     NSLog(@"preloaded in on enter");
     int screenWidth = self.contentSize.width;
     int screenHeight = self.contentSize.height;
-    
-    _physicsNode.contentSize = CGSizeMake(_grid.numCols*screenWidth, _grid.numRows*screenHeight);//screenSize;
+
     CCActionFollow *follow = [CCActionFollow actionWithTarget:_bike];
     [self runAction:follow];
     
@@ -131,22 +133,23 @@ static float SCALE_AMT = .28;
     newXPosition = clampf(newXPosition, 0, self.contentSize.width*_grid.numCols);
     CGFloat newYPosition = _bike.position.y;
     newYPosition = clampf(newYPosition, 0, self.contentSize.height*_grid.numRows);
-    _bike.position = CGPointMake(newXPosition, newYPosition);
-    
-    // i also want to tilt the bike sprite in the direction that i am rotating the phone.
-    // i know the angle is atan2(accel.y/accel.x). convert it to degrees.
-    _bike.rotation = (atan2(acceleration.y,acceleration.x)*180.0/M_PI);
-
-    // acceleration
-    CGFloat zAcc = acceleration.z;
-    [_bike.physicsBody applyImpulse:ccp(0,-1*(.5+zAcc))];
-    
-    // when bike gets to left or right boundaries of the scene,
-    // turn map to the left or right (swivel entire screen)
-    
-    //NSLog(@"currentmapppiece -%f < %f",_currentMapPiece.boundingBox.size.height, _currentMapPiece.position.y);
-    //CGPoint mapPos = [self convertToWorldSpace:_currentMapPiece.position];
+    self.position = CGPointMake(newXPosition, newYPosition);
     //CGPoint bikeWPos = [self convertToWorldSpace:_bike.position];
+    
+    // i know the angle is atan2(accel.y/accel.x). convert it to degrees.
+    float smoothingFactor = 0.85;
+    smooth_x = smoothingFactor*smooth_x + (1.0-smoothingFactor)*acceleration.x;
+    smooth_y = smoothingFactor*smooth_y + (1.0-smoothingFactor)*acceleration.y;
+    self.rotation = -1*(atan2(smooth_y,smooth_x)*180.0/(2*M_PI)); // angle edge case
+    
+    // acceleration
+    CGFloat zAcc = 2+abs(acceleration.z);
+    //[_bike.physicsBody applyImpulse:ccp(0,zAcc*pow(delta,2))];
+    CGFloat newX = newXPosition/self.contentSize.width;
+    CGFloat newY = zAcc*pow(delta,2)+self.anchorPoint.y;//newYPosition/self.contentSize.height;
+    self.anchorPoint = ccp(newX,newY);
+    
+    //CGPoint mapPos = [self convertToWorldSpace:_currentMapPiece.position];
     //NSLog(@"bikePos: %f / bikeWPos: %f",_bike.position.y,bikeWPos.y);
     
     /* loading more map pieces */
