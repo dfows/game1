@@ -156,30 +156,27 @@ static float SCALE_AMT = .28;
     smooth_y = smoothingFactor*smooth_y + (1.0-smoothingFactor)*acceleration.y;
     _mapNode.rotation = -1*(atan2(smooth_y,smooth_x)*180.0/(2*M_PI)); // angle edge case
     
-    //NSLog(@"**mapnode position is: %f,%f and its anchor point is at %f,%f and its content size is %fx%f", _mapNode.position.x,_mapNode.position.y,_mapNode.anchorPoint.x,_mapNode.anchorPoint.y,_mapNode.contentSize.width,_mapNode.contentSize.height);
-    
     /* loading more map pieces */
-    // TODO fix how this is detected
-    if (_mapNode.anchorPoint.y*self.contentSize.height > _currentMapPiece.position.y+self.contentSize.height/2) {
+    if (_mapNode.anchorPoint.y*self.contentSize.height > _currentMapPiece.position.y+self.contentSize.height) {
         NSLog(@"bikePos: %f / _currentMPPos: %f",_bike.position.y,_currentMapPiece.position.y+self.contentSize.height);
         NSLog(@"moved up");
         _currentTileRow++;
         NSLog(@"currentTileRow: %i",_currentTileRow);
         [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
     }
-    else if (_bike.position.y < _currentMapPiece.position.y) {
+    else if (_mapNode.anchorPoint.y*self.contentSize.height < _currentMapPiece.position.y) {
         NSLog(@"moved down");
         _currentTileRow--;
         NSLog(@"currentTileRow: %i",_currentTileRow);
         [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
     }
-    if (_bike.position.x > _currentMapPiece.position.x+self.contentSize.width) {
+    if (_mapNode.anchorPoint.x*self.contentSize.width > _currentMapPiece.position.x+self.contentSize.width) {
         NSLog(@"moved right");
         _currentTileCol++;
         NSLog(@"currentTileRow: %i",_currentTileRow);
         [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
     }
-    else if (_bike.position.x < _currentMapPiece.position.x) {
+    else if (_mapNode.anchorPoint.x*self.contentSize.width < _currentMapPiece.position.x) {
         NSLog(@"moved left");
         _currentTileCol--;
         NSLog(@"currentTileRow: %i",_currentTileRow);
