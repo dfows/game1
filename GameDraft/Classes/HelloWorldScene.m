@@ -24,6 +24,7 @@ static float SCALE_AMT = .28;
 
 @implementation HelloWorldScene
 {
+    CCNode *_mapNode; // wraps the map
     int _currentTileRow, _currentTileCol; // keeps track of current map piece with respect to array
     CCSprite *_currentMapPiece; // keeps track of dimensions of current map piece
     NSMutableArray *_currentlyLoadedPieces; // keeps track of map pieces that have been added to self as children
@@ -51,20 +52,24 @@ static float SCALE_AMT = .28;
 - (id)init
 {
     if (self = [super init]) {
-        self.anchorPoint = ccp(0.5,0.5);
         // init stuff
         // motion manager initialize
         _motionManager = [[CMMotionManager alloc] init];
+        
+        _grid = [[Maze alloc] init];
+        _currentTileRow = 0;
+        _currentTileCol = 0;
+        _currentlyLoadedPieces = [NSMutableArray array];
         
         _physicsNode = [CCPhysicsNode node];
         _physicsNode.collisionDelegate = self;
         _physicsNode.gravity = ccp(0,0);
         _physicsNode.contentSize = CGSizeMake(_grid.numCols*self.contentSize.width, _grid.numRows*self.contentSize.height);
         
-        _grid = [[Maze alloc] init];
-        _currentTileRow = 0;
-        _currentTileCol = 0;
-        _currentlyLoadedPieces = [NSMutableArray array];
+        _mapNode = [CCNode node];
+        _mapNode.anchorPoint = ccp(0.5,0.5);
+        _mapNode.contentSize = CGSizeMake(self.contentSize.width, self.contentSize.height);
+        [_physicsNode addChild:_mapNode];
         
         _traffic = [[Street alloc] init];
         _bike = [[Bicycle alloc] init];
@@ -105,12 +110,11 @@ static float SCALE_AMT = .28;
     // load in the map piece
     [self preloadSurroundingMapAtRow:(int)_currentTileRow andCol:(int)_currentTileCol];
     NSLog(@"preloaded in on enter");
-    int screenWidth = self.contentSize.width;
-    int screenHeight = self.contentSize.height;
 
     CCActionFollow *follow = [CCActionFollow actionWithTarget:_bike];
     [self runAction:follow];
     
+    NSLog(@"mapnode position is: %f,%f and its anchor point is at %f,%f and its content size is %fx%f", _mapNode.position.x,_mapNode.position.y,_mapNode.anchorPoint.x,_mapNode.anchorPoint.y,_mapNode.contentSize.width,_mapNode.contentSize.height);
     NSLog(@"physnode position is: %f,%f and its anchor point is at %f,%f", _physicsNode.position.x,_physicsNode.position.y,_physicsNode.anchorPoint.x,_physicsNode.anchorPoint.y);
     NSLog(@"traffic position is: %f,%f and its anchor point is at %f,%f", _traffic.position.x,_traffic.position.y,_traffic.anchorPoint.x,_traffic.anchorPoint.y);
     NSLog(@"bike position is: %f,%f and its anchor point is at %f,%f", _bike.position.x,_bike.position.y,_bike.anchorPoint.x,_bike.anchorPoint.y);
@@ -133,27 +137,30 @@ static float SCALE_AMT = .28;
     newXPosition = clampf(newXPosition, 0, self.contentSize.width*_grid.numCols);
     CGFloat newYPosition = _bike.position.y;
     newYPosition = clampf(newYPosition, 0, self.contentSize.height*_grid.numRows);
-    self.position = CGPointMake(newXPosition, newYPosition);
     //CGPoint bikeWPos = [self convertToWorldSpace:_bike.position];
+    
+    float dist = ccpDistance(_bike.position, ccp(newXPosition,newYPosition));
+    float a_rad = atan2(smooth_y,smooth_x);
+    
+    // acceleration
+    CGFloat zAcc = 5+abs(acceleration.z);
+    //[_bike.physicsBody applyImpulse:ccp((_bike.position.x-newXPosition)/newXPosition,zAcc*pow(delta,2))];
+    CGFloat newX = newXPosition/self.contentSize.width;
+    CGFloat newY = zAcc*pow(delta,2)+_mapNode.anchorPoint.y;
+    _mapNode.anchorPoint = ccp(newX,newY);
+    _mapNode.position = ccp(newXPosition,newYPosition);//ccp(newXPosition+dist*cos(a_rad), newYPosition+dist*sin(a_rad));
     
     // i know the angle is atan2(accel.y/accel.x). convert it to degrees.
     float smoothingFactor = 0.85;
     smooth_x = smoothingFactor*smooth_x + (1.0-smoothingFactor)*acceleration.x;
     smooth_y = smoothingFactor*smooth_y + (1.0-smoothingFactor)*acceleration.y;
-    self.rotation = -1*(atan2(smooth_y,smooth_x)*180.0/(2*M_PI)); // angle edge case
+    _mapNode.rotation = -1*(atan2(smooth_y,smooth_x)*180.0/(2*M_PI)); // angle edge case
     
-    // acceleration
-    CGFloat zAcc = 2+abs(acceleration.z);
-    //[_bike.physicsBody applyImpulse:ccp(0,zAcc*pow(delta,2))];
-    CGFloat newX = newXPosition/self.contentSize.width;
-    CGFloat newY = zAcc*pow(delta,2)+self.anchorPoint.y;//newYPosition/self.contentSize.height;
-    self.anchorPoint = ccp(newX,newY);
-    
-    //CGPoint mapPos = [self convertToWorldSpace:_currentMapPiece.position];
-    //NSLog(@"bikePos: %f / bikeWPos: %f",_bike.position.y,bikeWPos.y);
+    //NSLog(@"**mapnode position is: %f,%f and its anchor point is at %f,%f and its content size is %fx%f", _mapNode.position.x,_mapNode.position.y,_mapNode.anchorPoint.x,_mapNode.anchorPoint.y,_mapNode.contentSize.width,_mapNode.contentSize.height);
     
     /* loading more map pieces */
-    if (_bike.position.y > _currentMapPiece.position.y+self.contentSize.height) {
+    // TODO fix how this is detected
+    if (_mapNode.anchorPoint.y*self.contentSize.height > _currentMapPiece.position.y+self.contentSize.height/2) {
         NSLog(@"bikePos: %f / _currentMPPos: %f",_bike.position.y,_currentMapPiece.position.y+self.contentSize.height);
         NSLog(@"moved up");
         _currentTileRow++;
@@ -185,7 +192,7 @@ static float SCALE_AMT = .28;
         return;
     } else {
         for (int i = (int)([_currentlyLoadedPieces count]-1); i >= 0; i--) {
-            [self removeChild:[_currentlyLoadedPieces objectAtIndex:i]];
+            [_mapNode removeChild:[_currentlyLoadedPieces objectAtIndex:i]];
             [_currentlyLoadedPieces removeObjectAtIndex:i];
         }
     }
@@ -223,7 +230,7 @@ static float SCALE_AMT = .28;
                         _currentMapPiece = piece;
                     }
                     [_currentlyLoadedPieces addObject:piece];
-                    [self addChild:piece];
+                    [_mapNode addChild:piece];
                     int bloktype = [_grid.allNodes[j][i] intValue];
                     //NSLog(@"bloktype of cell at %i,%i is %i",j,i,bloktype);
                     if ((bloktype >> 0) & 1) { // if having a west wall
