@@ -114,10 +114,10 @@ static float SCALE_AMT = .28;
     CCActionFollow *follow = [CCActionFollow actionWithTarget:_bike];
     [self runAction:follow];
     
-    NSLog(@"mapnode position is: %f,%f and its anchor point is at %f,%f and its content size is %fx%f", _mapNode.position.x,_mapNode.position.y,_mapNode.anchorPoint.x,_mapNode.anchorPoint.y,_mapNode.contentSize.width,_mapNode.contentSize.height);
-    NSLog(@"physnode position is: %f,%f and its anchor point is at %f,%f", _physicsNode.position.x,_physicsNode.position.y,_physicsNode.anchorPoint.x,_physicsNode.anchorPoint.y);
-    NSLog(@"traffic position is: %f,%f and its anchor point is at %f,%f", _traffic.position.x,_traffic.position.y,_traffic.anchorPoint.x,_traffic.anchorPoint.y);
-    NSLog(@"bike position is: %f,%f and its anchor point is at %f,%f", _bike.position.x,_bike.position.y,_bike.anchorPoint.x,_bike.anchorPoint.y);
+//    NSLog(@"mapnode position is: %f,%f and its anchor point is at %f,%f and its content size is %fx%f", _mapNode.position.x,_mapNode.position.y,_mapNode.anchorPoint.x,_mapNode.anchorPoint.y,_mapNode.contentSize.width,_mapNode.contentSize.height);
+//    NSLog(@"physnode position is: %f,%f and its anchor point is at %f,%f", _physicsNode.position.x,_physicsNode.position.y,_physicsNode.anchorPoint.x,_physicsNode.anchorPoint.y);
+//    NSLog(@"traffic position is: %f,%f and its anchor point is at %f,%f", _traffic.position.x,_traffic.position.y,_traffic.anchorPoint.x,_traffic.anchorPoint.y);
+//    NSLog(@"bike position is: %f,%f and its anchor point is at %f,%f", _bike.position.x,_bike.position.y,_bike.anchorPoint.x,_bike.anchorPoint.y);
     
     
     // start tracking motion
@@ -132,35 +132,21 @@ static float SCALE_AMT = .28;
     /* motion */
     CMAccelerometerData *accelerometerData = _motionManager.accelerometerData;
     CMAcceleration acceleration = accelerometerData.acceleration;
-    /*
-    CGFloat newXPosition = self.contentSize.width/2;
-    //NSLog(@"accel: (%f,%f,%f)",acceleration.x,acceleration.y, acceleration.z);
-    newXPosition = clampf(newXPosition, 0, self.contentSize.width*_grid.numCols);
-    CGFloat newYPosition = self.contentSize.height/2;
-    newYPosition = clampf(newYPosition, 0, self.contentSize.height*_grid.numRows);
-     */
-    //CGPoint bikeWPos = [self convertToWorldSpace:_bike.position];
-    
-    //float dist = ccpDistance(_bike.position, ccp(newXPosition,newYPosition));
+    float smoothingFactor = 0.85;
+    smooth_x = smoothingFactor*smooth_x + (1.0-smoothingFactor)*acceleration.x;
+    smooth_y = smoothingFactor*smooth_y + (1.0-smoothingFactor)*acceleration.y;
     float a_rad = atan2(smooth_y,smooth_x); // angle of rotation in radians
     
     // acceleration
-    CGFloat mag_a = (fabsf(acceleration.z)-0.5)*-25; // magnitude of acceleration
-    //[_bike.physicsBody applyImpulse:ccp((_bike.position.x-newXPosition)/newXPosition,zAcc*pow(delta,2))];
+    CGFloat mag_a = fabsf(acceleration.z)*-1; // magnitude of acceleration
     CGFloat newX = -10*mag_a*sin(a_rad)*pow(delta,2)+_mapNode.anchorPoint.x;
     CGFloat newY = -10*mag_a*cos(a_rad)*pow(delta,2)+_mapNode.anchorPoint.y;
     _mapNode.anchorPoint = ccp(newX,newY);
     _mapNode.position = ccp(self.contentSize.width/2,self.contentSize.height/2);
     
-    // i know the angle is atan2(accel.y/accel.x). convert it to degrees.
-    float smoothingFactor = 0.85;
-    smooth_x = smoothingFactor*smooth_x + (1.0-smoothingFactor)*acceleration.x;
-    smooth_y = smoothingFactor*smooth_y + (1.0-smoothingFactor)*acceleration.y;
-    _mapNode.rotation = -1*(a_rad*180.0/(2*M_PI)); // TODO angle edge case
-    
-    CGPoint mapSCoors = [self convertToWorldSpace:_mapNode.position];
-    CGPoint mapWCoors = [self convertToNodeSpace:_mapNode.position];
-    NSLog(@"**mapnode position is: %f,%f and its anchor point is at %f,%f and world is %f,%f", _mapNode.position.x,_mapNode.position.y,_mapNode.anchorPoint.x,_mapNode.anchorPoint.y,mapWCoors.x,mapWCoors.y);
+    // rotation
+    // TODO make it increment instead of setting it to a designated angle
+    _mapNode.rotation = -1*(a_rad*180.0/M_PI); // TODO angle edge case
     
     /* loading more map pieces */
     if (_mapNode.anchorPoint.y*self.contentSize.height > _currentMapPiece.position.y+self.contentSize.height) {
