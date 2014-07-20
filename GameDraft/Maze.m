@@ -10,6 +10,19 @@
 #import "Maze.h"
 #import "CCSprite.h"
 
+struct Tuple {
+    int x;
+    int y;
+};
+typedef struct Tuple Tuple;
+CG_INLINE Tuple
+TupleMake(int x, int y)
+{
+    Tuple p; p.x = x; p.y = y; return p;
+}
+
+struct Tuple directions[4];
+
 @implementation Maze
 {
     int _numNodes;
@@ -18,6 +31,11 @@
 - (id)init {
     self = [super init];
     if (self) {
+        directions[0] = TupleMake(0,2);
+        directions[1] = TupleMake(0,-2);
+        directions[2] = TupleMake(2,0);
+        directions[3] = TupleMake(-2,0);
+        
         self.map = [[NSMutableArray alloc] init];
         self.allNodes = [[NSMutableArray alloc] init];
         self.numCols = arc4random()%5+5;
@@ -39,44 +57,37 @@
 }
 
 - (void)createMaze {
-    NSMutableArray *queue = [NSMutableArray array];
-    
-    [queue addObject:[NSNumber numberWithInt:0]]; // position 0,0
-    while ([queue count] != 0) {
-        // pop nodes (mark them)
-        NSNumber *current = [queue objectAtIndex:[queue count]-1];
-        [queue removeObject:current];
-        int currentNum = [current intValue];
-        //current cell's array row and col position
-        int c_row = currentNum/self.numCols;
-        int c_col = currentNum%self.numCols;
-        // if it's not rightmost
-        int cellType = [self.allNodes[c_row][c_col] intValue];
-        if (c_col < self.numCols-1) {
-            if ((cellType >> 2) & 1) {
-                // if its immediate right neighbor hasnt already had its west wall knocked down
-                int rightNeighbor = [_allNodes[c_row][c_col+1] intValue];
-                if (((rightNeighbor >> 0) & 1) && (arc4random()%3==2)) { // <=33% chance of this happening
-                //if ((rightNeighbor >> 0) & 1) {
-                    // knock down wall to immediate right neighbor
-                    [self knockDownWall:4 atRow:c_row atCol:c_col];
-                    // add its immediate right neighbor
-                    [queue addObject:[NSNumber numberWithInt:currentNum+1]];
-                    [self knockDownWall:1 atRow:c_row atCol:c_col+1]; // knock down the cell's west wall
-                }
-            }
+    int visitedNodes = 0;
+    Tuple currentPt,nextPt;
+    Tuple randomDir;
+    while (visitedNodes < _numNodes) {
+        currentPt = TupleMake(1+(arc4random()%((self.numCols-1)/2)*2),1+(arc4random()%((self.numRows-1)/2)*2));
+        randomDir = directions[arc4random()%4];
+        int nextX = currentPt.x+randomDir.x;
+        nextX = nextX > 0 ? (nextX < self.numCols-1 ? nextX : self.numCols-1) : 0;
+        int nextY = currentPt.y+randomDir.y;
+        nextY = nextY > 0 ? (nextY < self.numRows-1 ? nextY : self.numRows-1) : 0;
+        nextPt = TupleMake(nextX,nextY);
+        [self digBtwn:currentPt and:nextPt];
+        visitedNodes++;
+        currentPt = nextPt;
+    }
+}
+
+- (void)digBtwn:(Tuple)p1 and:(Tuple)p2 {
+    NSLog(@"p1 is %i,%i, p2 is %i,%i",p1.x,p1.y,p2.x,p2.y);
+    if (p1.x == p2.x) {
+        int largerY = (p1.y > p2.y) ? p1.y : p2.y;
+        int smallerY = (p1.y > p2.y) ? p2.y : p1.y;
+        for (int y = smallerY; y <= largerY; y++) {
+            self.allNodes[p1.x][y] = [NSNumber numberWithInteger:0];
         }
-        if (c_row < self.numRows-1) {
-            if ((cellType >> 3) & 1) { // if haven't knocked it down already
-                // knock down wall to above neighbor
-                [self knockDownWall:8 atRow:c_row atCol:c_col];
-                // and its above neighbor
-                int aboveNeighbor = [self.allNodes[c_row+1][c_col] intValue];
-                if (((aboveNeighbor >> 1) & 1) && (arc4random()%4!=3)) { // <= 75% chance of this happening
-                    [queue addObject:[NSNumber numberWithInt:currentNum+self.numCols]];
-                    [self knockDownWall:2 atRow:c_row+1 atCol:c_col]; // knock down the cell's southern wall
-                }
-            }
+    }
+    else {
+        int largerX = (p1.x > p2.x) ? p1.x : p2.x;
+        int smallerX = (p1.x > p2.x) ? p2.x : p1.x;
+        for (int x = smallerX; x <= largerX; x++) {
+            self.allNodes[x][p1.y] = [NSNumber numberWithInteger:0];
         }
     }
 }

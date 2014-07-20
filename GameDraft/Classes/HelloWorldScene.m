@@ -68,6 +68,7 @@ static float SCALE_AMT = .28;
         
         _mapNode = [CCNode node];
         _mapNode.anchorPoint = ccp(0.5,0.5);
+        // TODO gotta change initial position to one tile over because 0,0 is a mazewall
         _mapNode.contentSize = CGSizeMake(self.contentSize.width, self.contentSize.height);
         [_physicsNode addChild:_mapNode];
         
