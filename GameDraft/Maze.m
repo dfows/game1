@@ -56,7 +56,7 @@
             if ((cellType >> 2) & 1) {
                 // if its immediate right neighbor hasnt already had its west wall knocked down
                 int rightNeighbor = [_allNodes[c_row][c_col+1] intValue];
-                if (((rightNeighbor >> 0) & 1) && (arc4random()%3!=2)) { // <=66% chance of this happening
+                if (((rightNeighbor >> 0) & 1) && (arc4random()%3==2)) { // <=33% chance of this happening
                 //if ((rightNeighbor >> 0) & 1) {
                     // knock down wall to immediate right neighbor
                     [self knockDownWall:4 atRow:c_row atCol:c_col];
@@ -72,7 +72,7 @@
                 [self knockDownWall:8 atRow:c_row atCol:c_col];
                 // and its above neighbor
                 int aboveNeighbor = [self.allNodes[c_row+1][c_col] intValue];
-                if ((aboveNeighbor >> 1) & 1) {
+                if (((aboveNeighbor >> 1) & 1) && (arc4random()%4!=3)) { // <= 75% chance of this happening
                     [queue addObject:[NSNumber numberWithInt:currentNum+self.numCols]];
                     [self knockDownWall:2 atRow:c_row+1 atCol:c_col]; // knock down the cell's southern wall
                 }
@@ -87,17 +87,11 @@
 }
 
 - (void)createMap {
-    // get screen dimensions and such. ugh.
-    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-    CGFloat screenWidth = screenSize.width;
-    CGFloat screenHeight = screenSize.height;
-    
     // put all nodes into _map
     for (int j = 0; j < self.numRows; j++) {
         self.map[j] = [NSMutableArray array]; // class method
         for (int i = 0; i < self.numCols; i++) {
             int bloktype = [self.allNodes[j][i] intValue];
-            //NSLog(@"CELL NUMBER %i is type %i",j*self.numCols+i,bloktype);
             CCSprite *streetTile = [CCSprite spriteWithImageNamed:[NSString stringWithFormat:@"road_%i.png",bloktype]];
             streetTile.anchorPoint = ccp(0,0);
             [self.map[j] addObject:streetTile];

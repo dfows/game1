@@ -139,8 +139,8 @@ static float SCALE_AMT = .28;
     
     // acceleration
     CGFloat mag_a = fabsf(acceleration.z)*-1; // magnitude of acceleration
-    CGFloat newX = -10*mag_a*sin(a_rad)*pow(delta,2)+_mapNode.anchorPoint.x;
-    CGFloat newY = -10*mag_a*cos(a_rad)*pow(delta,2)+_mapNode.anchorPoint.y;
+    CGFloat newX = -15*mag_a*sin(a_rad)*pow(delta,2)+_mapNode.anchorPoint.x;
+    CGFloat newY = -15*mag_a*cos(a_rad)*pow(delta,2)+_mapNode.anchorPoint.y;
     _mapNode.anchorPoint = ccp(newX,newY);
     _mapNode.position = ccp(self.contentSize.width/2,self.contentSize.height/2);
     
