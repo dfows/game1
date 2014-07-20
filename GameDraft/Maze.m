@@ -64,9 +64,9 @@ struct Tuple directions[4];
         currentPt = TupleMake(1+(arc4random()%((self.numCols-1)/2)*2),1+(arc4random()%((self.numRows-1)/2)*2));
         randomDir = directions[arc4random()%4];
         int nextX = currentPt.x+randomDir.x;
-        nextX = nextX > 0 ? (nextX < self.numCols-1 ? nextX : self.numCols-1) : 0;
+        nextX = nextX >= 0 ? (nextX < self.numCols-1 ? nextX : self.numCols-1) : 0;
         int nextY = currentPt.y+randomDir.y;
-        nextY = nextY > 0 ? (nextY < self.numRows-1 ? nextY : self.numRows-1) : 0;
+        nextY = nextY >= 0 ? (nextY < self.numRows-1 ? nextY : self.numRows-1) : 0;
         nextPt = TupleMake(nextX,nextY);
         [self digBtwn:currentPt and:nextPt];
         visitedNodes++;
@@ -80,21 +80,16 @@ struct Tuple directions[4];
         int largerY = (p1.y > p2.y) ? p1.y : p2.y;
         int smallerY = (p1.y > p2.y) ? p2.y : p1.y;
         for (int y = smallerY; y <= largerY; y++) {
-            self.allNodes[p1.x][y] = [NSNumber numberWithInteger:0];
+            self.allNodes[y][p1.x] = [NSNumber numberWithInteger:0];
         }
     }
     else {
         int largerX = (p1.x > p2.x) ? p1.x : p2.x;
         int smallerX = (p1.x > p2.x) ? p2.x : p1.x;
         for (int x = smallerX; x <= largerX; x++) {
-            self.allNodes[x][p1.y] = [NSNumber numberWithInteger:0];
+            self.allNodes[p1.y][x] = [NSNumber numberWithInteger:0];
         }
     }
-}
-
-- (void)knockDownWall:(int)wallDir atRow:(int)rowNum atCol:(int)colNum {
-    NSNumber *currentCell = self.allNodes[rowNum][colNum];
-    self.allNodes[rowNum][colNum] = [NSNumber numberWithInt:[currentCell intValue]-wallDir];
 }
 
 - (void)createMap {
